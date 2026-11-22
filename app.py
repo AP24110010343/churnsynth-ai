@@ -4,16 +4,15 @@ import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 import streamlit as st
 import torch
 
 from diffusion_model import TabularPreprocessor, TabularDiffusionMLP, TabularDDPM
 from evaluate import compute_distribution_metrics, compute_correlation_difference, evaluate_ml_utility
 
-# ---------------------------------------------------------
-# Page Configuration
-# ---------------------------------------------------------
+# -----------------------------------------------------------------------------
+# 1. Page Configuration
+# -----------------------------------------------------------------------------
 st.set_page_config(
     page_title="ChurnSynth Platform | Tabular Diffusion Engine",
     page_icon="◈",
@@ -21,56 +20,93 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# ---------------------------------------------------------
-# Executive Design System & Styling (Stripe / Linear / Vercel)
-# ---------------------------------------------------------
+# -----------------------------------------------------------------------------
+# 2. Complete CSS Design Token Matrix (Linear x Vercel x Bloomberg)
+# -----------------------------------------------------------------------------
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
-/* Global Font & Canvas Atmosphere */
-html, body, [class*="css"], .stApp {
-    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif !important;
-    background-color: #07090E !important;
-    color: #E2E8F0 !important;
+/* --- 1. Global Canvas & Design Tokens --- */
+:root {
+    --cs-canvas: #080A0F;
+    --cs-surface-sidebar: #0A0D15;
+    --cs-surface-l1: #0F131D;
+    --cs-surface-l2: #161C2A;
+    --cs-surface-l3: #1E2638;
+    
+    --cs-border-subtle: rgba(255, 255, 255, 0.05);
+    --cs-border-default: rgba(255, 255, 255, 0.07);
+    --cs-border-hover: rgba(255, 255, 255, 0.12);
+    --cs-border-active: rgba(255, 255, 255, 0.20);
+    
+    --cs-text-primary: #F8FAFC;
+    --cs-text-secondary: #94A3B8;
+    --cs-text-tertiary: #64748B;
+    --cs-text-disabled: #334155;
+    
+    --cs-brand: #4F46E5;
+    --cs-brand-hover: #4338CA;
+    --cs-emerald: #10B981;
+    --cs-rose: #F43F5E;
+    --cs-amber: #F59E0B;
 }
 
-/* Background Mesh & Ambient Glow */
+/* Global Reset - Strict Matte Dark Canvas */
+html, body, [class*="css"], .stApp {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    background-color: var(--cs-canvas) !important;
+    color: var(--cs-text-primary) !important;
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+}
+
 .stApp {
-    background: radial-gradient(1100px circle at 50% -120px, rgba(99, 102, 241, 0.16), transparent 60%),
-                radial-gradient(900px circle at 85% 300px, rgba(16, 185, 129, 0.08), transparent 50%),
-                radial-gradient(800px circle at 15% 600px, rgba(6, 182, 212, 0.08), transparent 50%),
-                #07090E !important;
+    background: var(--cs-canvas) !important;
+}
+
+.block-container {
+    padding-top: 1.25rem !important;
+    padding-bottom: 2rem !important;
+    max-width: 1440px !important;
 }
 
 header[data-testid="stHeader"] {
     background: transparent !important;
 }
 
-/* Sleek Scrollbars */
-::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-}
-::-webkit-scrollbar-track {
-    background: #0A0E17;
-}
-::-webkit-scrollbar-thumb {
-    background: #1E293B;
-    border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-    background: #334155;
+/* Monospace & Tabular Numerics Enforcement */
+code, pre, .mono-data, [data-testid="stMetricValue"] {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11", "tnum" 1, "zero" 1 !important;
+    font-variant-numeric: tabular-nums slashed-zero !important;
 }
 
-/* Enterprise Top Bar */
+/* --- 2. Precision Scrollbars --- */
+::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+}
+::-webkit-scrollbar-track {
+    background: var(--cs-canvas);
+}
+::-webkit-scrollbar-thumb {
+    background: var(--cs-border-default);
+    border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--cs-border-hover);
+}
+
+/* --- 3. Top Navigation Bar --- */
 .top-nav-bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-bottom: 12px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-    margin-bottom: 16px;
+    height: 38px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--cs-border-default);
+    margin-bottom: 14px;
 }
 
 .nav-breadcrumbs {
@@ -78,14 +114,14 @@ header[data-testid="stHeader"] {
     align-items: center;
     gap: 6px;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 0.72rem;
+    font-size: 0.70rem;
     letter-spacing: 0.02em;
 }
 
-.nav-org { color: #64748B; font-weight: 500; }
-.nav-slash { color: #334155; }
-.nav-product { color: #94A3B8; }
-.nav-current { color: #F1F5F9; font-weight: 600; }
+.nav-brand { color: #818CF8; font-weight: 600; }
+.nav-slash { color: var(--cs-text-disabled); }
+.nav-segment { color: var(--cs-text-tertiary); font-weight: 500; }
+.nav-current { color: var(--cs-text-primary); font-weight: 600; }
 
 .nav-status-group {
     display: flex;
@@ -96,405 +132,373 @@ header[data-testid="stHeader"] {
 .status-pill {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    background: #0B0F17;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    color: #94A3B8;
+    gap: 5px;
+    background: var(--cs-surface-l1);
+    border: 1px solid var(--cs-border-default);
+    color: var(--cs-text-secondary);
     font-family: 'JetBrains Mono', monospace;
-    font-size: 0.70rem;
+    font-size: 0.65rem;
     font-weight: 500;
-    padding: 2px 8px;
-    border-radius: 4px;
+    padding: 2px 7px;
+    border-radius: 3px;
 }
 
-.status-dot-solid {
+.status-dot {
     width: 5px;
     height: 5px;
-    background-color: #10B981;
+    background-color: var(--cs-emerald);
     border-radius: 50%;
 }
 
 .version-tag {
     background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.07);
-    color: #64748B;
+    border: 1px solid var(--cs-border-subtle);
+    color: var(--cs-text-tertiary);
     font-family: 'JetBrains Mono', monospace;
-    font-size: 0.68rem;
-    padding: 2px 6px;
-    border-radius: 4px;
+    font-size: 0.65rem;
+    padding: 2px 5px;
+    border-radius: 3px;
 }
 
-/* Hero Title & Typography */
+/* --- 4. Hero Section --- */
 .hero-title {
-    font-size: 1.55rem;
+    font-size: 1.35rem;
     font-weight: 600;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.025em;
     line-height: 1.2;
-    color: #F8FAFC;
-    margin-top: 0px;
-    margin-bottom: 4px;
+    color: var(--cs-text-primary);
+    margin: 0 0 3px 0;
 }
 
 .hero-subtitle {
-    font-size: 0.84rem;
-    color: #94A3B8;
-    line-height: 1.4;
-    max-width: 860px;
-    margin-bottom: 12px;
+    font-size: 0.81rem;
+    color: var(--cs-text-secondary);
+    line-height: 1.45;
+    max-width: 900px;
+    margin-bottom: 10px;
     font-weight: 400;
 }
 
-/* Metadata Tag Badges */
 .enterprise-tag-list {
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
-    margin-bottom: 18px;
+    margin-bottom: 14px;
 }
 
 .tag-item {
     display: inline-flex;
     align-items: center;
-    background: #0B0F17;
-    border: 1px solid rgba(255, 255, 255, 0.07);
+    background: var(--cs-surface-l1);
+    border: 1px solid var(--cs-border-default);
     color: #CBD5E1;
-    padding: 3px 8px;
-    border-radius: 4px;
-    font-size: 0.72rem;
+    padding: 2px 7px;
+    border-radius: 3px;
+    font-size: 0.68rem;
     letter-spacing: 0.01em;
 }
 
 .tag-label {
-    color: #64748B;
+    color: var(--cs-text-tertiary);
     font-family: 'JetBrains Mono', monospace;
-    font-size: 0.65rem;
+    font-size: 0.62rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.06em;
     margin-right: 5px;
 }
 
-/* Metadata Pill Badges */
-.pill-group {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 24px;
-}
-
-.pill-item {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 5px 12px;
-    border-radius: 8px;
-    font-size: 0.78rem;
-    font-weight: 500;
-    backdrop-filter: blur(8px);
-}
-
-.pill-indigo {
-    background: rgba(99, 102, 241, 0.1);
-    border: 1px solid rgba(99, 102, 241, 0.25);
-    color: #C7D2FE;
-}
-
-.pill-emerald {
-    background: rgba(16, 185, 129, 0.1);
-    border: 1px solid rgba(16, 185, 129, 0.25);
-    color: #A7F3D0;
-}
-
-.pill-cyan {
-    background: rgba(6, 182, 212, 0.1);
-    border: 1px solid rgba(6, 182, 212, 0.25);
-    color: #BAE6FD;
-}
-
-.pill-violet {
-    background: rgba(139, 92, 246, 0.1);
-    border: 1px solid rgba(139, 92, 246, 0.25);
-    color: #DDD6FE;
-}
-
-/* Enterprise Metric Cards */
-.metric-grid {
+/* --- 5. High-Density KPI Metric Grid --- */
+.kpi-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-    margin-bottom: 20px;
+    gap: 10px;
+    margin-bottom: 16px;
 }
 
 @media (max-width: 900px) {
-    .metric-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
-.glass-card {
-    background: #0B0E17;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 8px;
-    padding: 12px 14px;
-    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05), 0 2px 6px rgba(0, 0, 0, 0.25);
-    transition: border-color 0.15s ease;
-    position: relative;
+.kpi-card {
+    background: var(--cs-surface-l1);
+    border: 1px solid var(--cs-border-default);
+    border-radius: 6px;
+    padding: 10px 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+    transition: border-color 0.12s ease;
 }
 
-.glass-card:hover {
-    border-color: rgba(255, 255, 255, 0.16);
+.kpi-card:hover {
+    border-color: var(--cs-border-hover);
 }
 
-.metric-header {
+.kpi-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
 }
 
-.metric-label {
-    font-size: 0.65rem;
+.kpi-label {
+    font-size: 0.62rem;
     font-weight: 600;
-    letter-spacing: 0.07em;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: #64748B;
+    color: var(--cs-text-tertiary);
     font-family: 'JetBrains Mono', monospace;
 }
 
-.metric-value {
-    font-family: 'JetBrains Mono', monospace !important;
-    font-size: 1.55rem;
-    font-weight: 600;
-    color: #F8FAFC;
-    letter-spacing: -0.02em;
-    line-height: 1.1;
-    margin-bottom: 6px;
+.kpi-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    color: var(--cs-text-tertiary);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--cs-border-subtle);
+    padding: 1px 4px;
+    border-radius: 2px;
 }
 
-.metric-footer {
+.kpi-value {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 1.45rem;
+    font-weight: 600;
+    color: var(--cs-text-primary);
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin-bottom: 4px;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11", "tnum" 1, "zero" 1;
+    font-variant-numeric: tabular-nums slashed-zero;
+}
+
+.kpi-footer {
     display: flex;
     align-items: center;
     gap: 6px;
-    font-size: 0.72rem;
+    font-size: 0.68rem;
 }
 
 .delta-badge {
     display: inline-flex;
     align-items: center;
     gap: 3px;
-    padding: 1px 6px;
-    border-radius: 3px;
-    font-size: 0.68rem;
+    padding: 1px 5px;
+    border-radius: 2px;
+    font-size: 0.64rem;
     font-weight: 500;
     font-family: 'JetBrains Mono', monospace;
+    font-variant-numeric: tabular-nums;
 }
 
 .delta-neutral {
     background: rgba(148, 163, 184, 0.08);
-    color: #94A3B8;
+    color: var(--cs-text-secondary);
     border: 1px solid rgba(148, 163, 184, 0.15);
 }
 
-.delta-positive {
+.delta-pos {
     background: rgba(16, 185, 129, 0.08);
-    color: #34D399;
-    border: 1px solid rgba(16, 185, 129, 0.2);
+    color: var(--cs-emerald);
+    border: 1px solid rgba(16, 185, 129, 0.20);
 }
 
-.delta-negative {
+.delta-neg {
     background: rgba(244, 63, 94, 0.08);
-    color: #FB7185;
-    border: 1px solid rgba(244, 63, 94, 0.2);
+    color: var(--cs-rose);
+    border: 1px solid rgba(244, 63, 94, 0.20);
 }
 
-.metric-subtext {
-    color: #64748B;
-    font-size: 0.70rem;
+.baseline-text {
+    color: var(--cs-text-tertiary);
+    font-size: 0.65rem;
     font-family: 'JetBrains Mono', monospace;
 }
 
-/* Tabs Styling - Linear Segmented Control */
+/* --- 6. Linear-Grade Segmented Tabs --- */
 .stTabs [data-baseweb="tab-list"] {
-    background-color: rgba(15, 23, 42, 0.75) !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
-    border-radius: 12px !important;
-    padding: 5px !important;
-    gap: 4px !important;
+    background-color: var(--cs-surface-l1) !important;
+    border: 1px solid var(--cs-border-default) !important;
+    border-radius: 6px !important;
+    padding: 3px !important;
+    gap: 3px !important;
+    margin-bottom: 14px !important;
 }
 
 .stTabs [data-baseweb="tab"] {
-    height: 42px !important;
-    border-radius: 8px !important;
-    color: #94A3B8 !important;
-    font-size: 0.85rem !important;
+    height: 32px !important;
+    border-radius: 4px !important;
+    color: var(--cs-text-secondary) !important;
+    font-size: 0.78rem !important;
     font-weight: 500 !important;
-    padding: 0 16px !important;
+    padding: 0 14px !important;
     border: none !important;
     background-color: transparent !important;
-    transition: all 0.2s ease !important;
+    transition: all 0.12s ease !important;
 }
 
 .stTabs [data-baseweb="tab"]:hover {
-    color: #F8FAFC !important;
+    color: var(--cs-text-primary) !important;
     background-color: rgba(255, 255, 255, 0.04) !important;
 }
 
 .stTabs [aria-selected="true"] {
-    background: rgba(99, 102, 241, 0.22) !important;
-    border: 1px solid rgba(99, 102, 241, 0.45) !important;
+    background: var(--cs-surface-l3) !important;
+    border: 1px solid var(--cs-border-hover) !important;
     color: #FFFFFF !important;
     font-weight: 600 !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35) !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35) !important;
 }
 
 .stTabs [data-baseweb="tab-highlight"] {
     display: none !important;
 }
 
-/* Sidebar Customization */
+/* --- 7. Sidebar Parameter Panel --- */
 section[data-testid="stSidebar"] {
-    background-color: #0A0D15 !important;
-    border-right: 1px solid rgba(255, 255, 255, 0.07) !important;
+    background-color: var(--cs-surface-sidebar) !important;
+    border-right: 1px solid var(--cs-border-default) !important;
 }
 
 .sidebar-title {
-    font-size: 1.05rem;
-    font-weight: 700;
-    color: #F8FAFC;
-    letter-spacing: -0.02em;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 4px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--cs-text-primary);
+    letter-spacing: -0.015em;
+    margin-bottom: 2px;
 }
 
 .sidebar-subtitle {
-    font-size: 0.8rem;
-    color: #64748B;
-    margin-bottom: 16px;
+    font-size: 0.74rem;
+    color: var(--cs-text-tertiary);
+    margin-bottom: 12px;
+    line-height: 1.4;
 }
 
 .sidebar-section-title {
-    font-size: 0.72rem;
-    font-weight: 700;
+    font-size: 0.65rem;
+    font-weight: 600;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: #64748B;
-    margin-top: 18px;
-    margin-bottom: 10px;
+    color: var(--cs-text-tertiary);
+    margin-top: 14px;
+    margin-bottom: 8px;
+    font-family: 'JetBrains Mono', monospace;
 }
 
 .sidebar-spec-box {
-    background: rgba(15, 23, 42, 0.65);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 10px;
-    padding: 12px 14px;
-    margin-bottom: 16px;
+    background: var(--cs-surface-l1);
+    border: 1px solid var(--cs-border-subtle);
+    border-radius: 6px;
+    padding: 8px 10px;
+    margin-bottom: 12px;
 }
 
 .sidebar-spec-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 0.8rem;
-    padding: 5px 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    font-size: 0.74rem;
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
 }
 
 .sidebar-spec-row:last-child {
     border-bottom: none;
 }
 
-.spec-key {
-    color: #94A3B8;
-}
-
+.spec-key { color: var(--cs-text-secondary); }
 .spec-val {
-    color: #F8FAFC;
+    color: var(--cs-text-primary);
     font-family: 'JetBrains Mono', monospace;
     font-weight: 500;
 }
 
-/* Executive Action Buttons */
-button[data-testid="baseButton-primary"] {
-    background: linear-gradient(135deg, #4F46E5 0%, #06B6D4 100%) !important;
-    border: 1px solid rgba(255, 255, 255, 0.15) !important;
-    border-radius: 8px !important;
+/* Primary Action Buttons (Solid Indigo, No Neon Glow) */
+button[data-testid="baseButton-primary"], .stDownloadButton > button {
+    background: var(--cs-brand) !important;
+    border: 1px solid var(--cs-border-hover) !important;
+    border-radius: 5px !important;
     font-weight: 600 !important;
-    font-size: 0.85rem !important;
-    padding: 8px 18px !important;
+    font-size: 0.78rem !important;
+    padding: 6px 14px !important;
     color: #FFFFFF !important;
-    box-shadow: 0 4px 14px -2px rgba(79, 70, 229, 0.45) !important;
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+    transition: background-color 0.12s ease, border-color 0.12s ease !important;
 }
 
-button[data-testid="baseButton-primary"]:hover {
-    transform: translateY(-1px) !important;
-    box-shadow: 0 6px 20px -2px rgba(79, 70, 229, 0.65) !important;
-    border-color: rgba(255, 255, 255, 0.3) !important;
+button[data-testid="baseButton-primary"]:hover, .stDownloadButton > button:hover {
+    background: var(--cs-brand-hover) !important;
+    border-color: var(--cs-border-active) !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4) !important;
 }
 
-/* Content Container Card */
-.content-card {
-    background: rgba(15, 23, 42, 0.55);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 14px;
-    padding: 22px;
-    margin-bottom: 22px;
+button[data-testid="baseButton-secondary"] {
+    background: var(--cs-surface-l1) !important;
+    border: 1px solid var(--cs-border-default) !important;
+    border-radius: 5px !important;
+    color: var(--cs-text-primary) !important;
+    font-size: 0.78rem !important;
 }
 
-.card-title {
-    font-size: 1.12rem;
-    font-weight: 700;
-    color: #F8FAFC;
-    letter-spacing: -0.02em;
-    margin-bottom: 4px;
+/* Form Controls & Dropdowns */
+div[data-baseweb="select"] > div {
+    background-color: var(--cs-surface-l1) !important;
+    border-color: var(--cs-border-default) !important;
+    border-radius: 4px !important;
+    font-size: 0.80rem !important;
 }
 
-.card-desc {
-    font-size: 0.85rem;
-    color: #94A3B8;
-    margin-bottom: 18px;
-    line-height: 1.5;
+div[data-baseweb="select"] > div:hover {
+    border-color: var(--cs-border-hover) !important;
 }
 
-/* Dataframe Container */
+div[data-baseweb="tag"] {
+    background-color: var(--cs-surface-l3) !important;
+    border: 1px solid var(--cs-border-hover) !important;
+    border-radius: 3px !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.72rem !important;
+    color: #CBD5E1 !important;
+}
+
+/* --- 8. Dataframe & Table Styling --- */
 .stDataFrame {
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
-    border-radius: 10px !important;
+    border: 1px solid var(--cs-border-default) !important;
+    border-radius: 6px !important;
     overflow: hidden !important;
 }
 
-/* Custom Callout Box */
-.custom-callout {
-    background: rgba(99, 102, 241, 0.08);
-    border: 1px solid rgba(99, 102, 241, 0.25);
-    border-radius: 10px;
-    padding: 14px 18px;
-    margin-bottom: 16px;
+/* --- 9. Clean Callout Boxes --- */
+.callout-box {
+    background: var(--cs-surface-l1);
+    border: 1px solid var(--cs-border-default);
+    border-radius: 5px;
+    padding: 10px 12px;
+    margin-bottom: 12px;
     display: flex;
     align-items: flex-start;
-    gap: 12px;
+    gap: 10px;
 }
 
-.custom-callout-icon {
-    font-size: 1.1rem;
+.callout-icon {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 600;
     line-height: 1.4;
+    color: #818CF8;
 }
 
-.custom-callout-text {
-    font-size: 0.85rem;
+.callout-text {
+    font-size: 0.78rem;
     color: #CBD5E1;
-    line-height: 1.5;
+    line-height: 1.45;
 }
 </style>
 """, unsafe_allow_html=True)
 
-# ---------------------------------------------------------
-# Helper Functions & Resource Caching
-# ---------------------------------------------------------
+# -----------------------------------------------------------------------------
+# 3. Model Resources & State Caching
+# -----------------------------------------------------------------------------
 @st.cache_resource
 def load_resources():
     device = 'cuda' if torch.cuda.is_available() else ('mps' if torch.backends.mps.is_available() else 'cpu')
@@ -522,66 +526,89 @@ def load_resources():
 
 df_real, preprocessor, ddpm, data_dim = load_resources()
 
-# Initialize Session State
+# Initialize Synthetic Cohort in Session State
 if 'synthetic_df' not in st.session_state:
     with st.spinner("Initializing Tabular DDPM reverse sampling..."):
         vectors = ddpm.sample(n_samples=1000, data_dim=data_dim, temperature=0.95)
         st.session_state['synthetic_df'] = preprocessor.inverse_transform(vectors)
 
-# Plotly Executive Theme Helper
-def get_executive_layout(title="", subtitle="", height=420, legend=None):
+# -----------------------------------------------------------------------------
+# 4. Executive Plotly Layout Engine (Centralized Specification)
+# -----------------------------------------------------------------------------
+def get_executive_layout(title: str = "", subtitle: str = "", height: int = 360, legend: dict = None) -> dict:
+    """Returns authoritative Plotly layout matching ChurnSynth design specifications."""
     base_legend = dict(
-        bgcolor="rgba(15, 23, 42, 0.65)",
+        bgcolor="rgba(15, 19, 29, 0.85)",
         bordercolor="rgba(255, 255, 255, 0.08)",
         borderwidth=1,
-        font=dict(size=11, color="#CBD5E1")
+        font=dict(family="Plus Jakarta Sans, -apple-system, sans-serif", size=11, color="#CBD5E1")
     )
     if legend:
         base_legend.update(legend)
 
+    if subtitle:
+        title_html = (
+            f"<span style='font-family: Plus Jakarta Sans; font-size: 13.5px; font-weight: 600; color: #F8FAFC;'>{title}</span>"
+            f"<br><span style='font-family: Plus Jakarta Sans; font-size: 11px; font-weight: 400; color: #64748B;'>{subtitle}</span>"
+        )
+    else:
+        title_html = f"<span style='font-family: Plus Jakarta Sans; font-size: 13.5px; font-weight: 600; color: #F8FAFC;'>{title}</span>"
+
     return dict(
         title=dict(
-            text=f"<b>{title}</b><br><span style='font-size:11px;color:#64748B;font-weight:400'>{subtitle}</span>" if subtitle else f"<b>{title}</b>",
-            font=dict(family="Plus Jakarta Sans, sans-serif", size=15, color="#F8FAFC"),
+            text=title_html,
             x=0.01,
-            y=0.96
+            y=0.96,
+            xanchor="left",
+            yanchor="top"
         ),
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
-        font=dict(family="Plus Jakarta Sans, sans-serif", size=12, color="#94A3B8"),
+        paper_bgcolor="rgba(0, 0, 0, 0)",
+        plot_bgcolor="rgba(0, 0, 0, 0)",
+        font=dict(family="Plus Jakarta Sans, sans-serif", size=11, color="#94A3B8"),
         height=height,
-        margin=dict(l=45, r=25, t=55 if subtitle else 40, b=45),
+        margin=dict(l=45, r=25, t=52 if subtitle else 38, b=42),
+        hoverlabel=dict(
+            bgcolor="#0F131D",
+            bordercolor="rgba(255, 255, 255, 0.15)",
+            font=dict(family="JetBrains Mono, monospace", size=11, color="#F8FAFC")
+        ),
         xaxis=dict(
-            gridcolor="rgba(255, 255, 255, 0.06)",
-            zerolinecolor="rgba(255, 255, 255, 0.12)",
-            tickfont=dict(size=11, color="#94A3B8")
+            gridcolor="rgba(255, 255, 255, 0.05)",
+            zerolinecolor="rgba(255, 255, 255, 0.10)",
+            tickfont=dict(family="JetBrains Mono, monospace", size=10.5, color="#64748B"),
+            title=dict(font=dict(family="Plus Jakarta Sans, sans-serif", size=11, color="#94A3B8")),
+            linecolor="rgba(255, 255, 255, 0.07)",
+            linewidth=1
         ),
         yaxis=dict(
-            gridcolor="rgba(255, 255, 255, 0.06)",
-            zerolinecolor="rgba(255, 255, 255, 0.12)",
-            tickfont=dict(size=11, color="#94A3B8")
+            gridcolor="rgba(255, 255, 255, 0.05)",
+            zerolinecolor="rgba(255, 255, 255, 0.10)",
+            tickfont=dict(family="JetBrains Mono, monospace", size=10.5, color="#64748B"),
+            title=dict(font=dict(family="Plus Jakarta Sans, sans-serif", size=11, color="#94A3B8")),
+            linecolor="rgba(255, 255, 255, 0.07)",
+            linewidth=1
         ),
         legend=base_legend
     )
 
-# ---------------------------------------------------------
-# Enterprise Top Navigation & Metadata
-# ---------------------------------------------------------
+# -----------------------------------------------------------------------------
+# 5. Top Navigation & Header
+# -----------------------------------------------------------------------------
 st.markdown("""
 <div class="top-nav-bar">
     <div class="nav-breadcrumbs">
-        <span class="nav-org">ChurnSynth Platform</span>
+        <span class="nav-brand">◈ CHURNSYNTH</span>
         <span class="nav-slash">/</span>
-        <span class="nav-product">Retail Analytics</span>
+        <span class="nav-segment">RETAIL ANALYTICS</span>
         <span class="nav-slash">/</span>
-        <span class="nav-current">Subscription Churn Simulator</span>
+        <span class="nav-current">SUBSCRIPTION CHURN SIMULATOR</span>
     </div>
     <div class="nav-status-group">
         <span class="status-pill">
-            <span class="status-dot-solid"></span>
-            Model Ready
+            <span class="status-dot"></span>
+            MODEL ACTIVE
         </span>
-        <span class="version-tag">v2.4 LTS</span>
+        <span class="version-tag">v2.4-PRO</span>
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -601,40 +628,48 @@ Designed to validate downstream predictive ML pipelines without customer data ex
 </div>
 """, unsafe_allow_html=True)
 
-# ---------------------------------------------------------
-# Sidebar Controls & Engine Configuration
-# ---------------------------------------------------------
+# -----------------------------------------------------------------------------
+# 6. Sidebar Generator Controls
+# -----------------------------------------------------------------------------
 with st.sidebar:
     st.markdown("""
-    <div class="sidebar-title">
-        <span>Generator Parameters</span>
-    </div>
-    <div class="sidebar-subtitle">
-        Configure diffusion parameters for reverse Gaussian sampling:
-    </div>
+    <div class="sidebar-title">GENERATOR PARAMETERS</div>
+    <div class="sidebar-subtitle">Configure reverse diffusion sampling engine:</div>
     """, unsafe_allow_html=True)
     
-    n_samples = st.slider("Synthetic Cohort Size (N)", min_value=200, max_value=5000, value=1000, step=100)
-    temperature = st.slider("Diffusion Temperature (Diversity)", min_value=0.50, max_value=1.50, value=0.95, step=0.05,
-                            help="Entropy scaling during reverse steps. 0.95 is calibrated for optimal balance between mode fidelity and edge diversity.")
+    n_samples = st.slider(
+        "Synthetic Cohort Size (N)",
+        min_value=200,
+        max_value=5000,
+        value=1000,
+        step=100
+    )
+    temperature = st.slider(
+        "Diffusion Temperature (Diversity)",
+        min_value=0.50,
+        max_value=1.50,
+        value=0.95,
+        step=0.05,
+        help="Entropy scaling during reverse steps. 0.95 is calibrated for optimal balance between mode fidelity and edge diversity."
+    )
     
     st.markdown('<div class="sidebar-section-title">Architecture Specifications</div>', unsafe_allow_html=True)
     st.markdown(f"""
     <div class="sidebar-spec-box">
         <div class="sidebar-spec-row">
             <span class="spec-key">Model Family</span>
-            <span class="spec-val">Tabular DDPM MLP</span>
+            <span class="spec-val">Tabular DDPM</span>
         </div>
         <div class="sidebar-spec-row">
             <span class="spec-key">Feature Slices</span>
-            <span class="spec-val">{data_dim} Continuous Dims</span>
+            <span class="spec-val">{data_dim} Continuous</span>
         </div>
         <div class="sidebar-spec-row">
             <span class="spec-key">Denoising Steps (T)</span>
             <span class="spec-val">100 Steps</span>
         </div>
         <div class="sidebar-spec-row">
-            <span class="spec-key">Compute Engine</span>
+            <span class="spec-key">Compute Device</span>
             <span class="spec-val">{ddpm.device.upper()}</span>
         </div>
     </div>
@@ -642,12 +677,15 @@ with st.sidebar:
     
     st.markdown('<div class="sidebar-section-title">Differential Privacy & Governance</div>', unsafe_allow_html=True)
     st.markdown("""
-    <div style="font-size: 0.78rem; color: #94A3B8; line-height: 1.45; margin-bottom: 16px; background: rgba(16, 185, 129, 0.05); padding: 10px; border-radius: 8px; border: 1px solid rgba(16, 185, 129, 0.15);">
-        <b>Privacy Guarantee:</b> Synthetic rows represent probabilistic trajectories rather than 1:1 records of real subscribers (Membership Inference Protection).
+    <div class="callout-box" style="margin-bottom: 14px;">
+        <div class="callout-icon">ℹ</div>
+        <div class="callout-text">
+            <b>Privacy Guarantee:</b> Synthetic rows represent probabilistic trajectories rather than 1:1 records of real subscribers (Membership Inference Protection).
+        </div>
     </div>
     """, unsafe_allow_html=True)
     
-    if st.button("Sample Synthetic Cohort", use_container_width=True, type="primary"):
+    if st.button("Sample Synthetic Cohort (Reverse SDE)", width="stretch", type="primary"):
         with st.spinner(f"Executing reverse diffusion across 100 timesteps for {n_samples:,} records..."):
             vectors = ddpm.sample(n_samples=n_samples, data_dim=data_dim, temperature=temperature)
             st.session_state['synthetic_df'] = preprocessor.inverse_transform(vectors)
@@ -655,9 +693,9 @@ with st.sidebar:
 
 df_synth = st.session_state['synthetic_df']
 
-# ---------------------------------------------------------
-# Executive KPI Metric Grid
-# ---------------------------------------------------------
+# -----------------------------------------------------------------------------
+# 7. High-Density KPI Metric Ribbon (4 Columns)
+# -----------------------------------------------------------------------------
 synth_count = len(df_synth)
 synth_churn = df_synth['churned'].mean()
 real_churn = df_real['churned'].mean()
@@ -671,65 +709,65 @@ synth_tenure = df_synth['tenure_months'].mean()
 real_tenure = df_real['tenure_months'].mean()
 tenure_diff = synth_tenure - real_tenure
 
-churn_badge_class = "delta-positive" if abs(churn_diff) <= 0.02 else ("delta-neutral" if abs(churn_diff) <= 0.05 else "delta-negative")
-fee_badge_class = "delta-positive" if abs(fee_diff) <= 1.5 else "delta-neutral"
-tenure_badge_class = "delta-positive" if abs(tenure_diff) <= 1.0 else "delta-neutral"
+churn_badge_class = "delta-pos" if abs(churn_diff) <= 0.02 else ("delta-neutral" if abs(churn_diff) <= 0.05 else "delta-neg")
+fee_badge_class = "delta-pos" if abs(fee_diff) <= 1.5 else "delta-neutral"
+tenure_badge_class = "delta-pos" if abs(tenure_diff) <= 1.0 else "delta-neutral"
 
 st.markdown(f"""
-<div class="metric-grid">
-    <div class="glass-card">
-        <div class="metric-header">
-            <span class="metric-label">Cohort Volume</span>
-            <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #818CF8; background: rgba(99, 102, 241, 0.1); padding: 2px 6px; border-radius: 3px;">N-RECORDS</span>
+<div class="kpi-grid">
+    <div class="kpi-card">
+        <div class="kpi-header">
+            <span class="kpi-label">COHORT SIZE</span>
+            <span class="kpi-tag">N-RECORDS</span>
         </div>
-        <div class="metric-value">{synth_count:,}</div>
-        <div class="metric-footer">
+        <div class="kpi-value">{synth_count:,}</div>
+        <div class="kpi-footer">
             <span class="delta-badge delta-neutral">Active Sample</span>
-            <span class="metric-subtext">Reverse SDE</span>
+            <span class="baseline-text">Reverse SDE (100)</span>
         </div>
     </div>
     
-    <div class="glass-card">
-        <div class="metric-header">
-            <span class="metric-label">Simulated Churn Rate</span>
-            <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #34D399; background: rgba(16, 185, 129, 0.1); padding: 2px 6px; border-radius: 3px;">TARGET</span>
+    <div class="kpi-card">
+        <div class="kpi-header">
+            <span class="kpi-label">SIMULATED CHURN</span>
+            <span class="kpi-tag">TARGET</span>
         </div>
-        <div class="metric-value">{synth_churn:.1%}</div>
-        <div class="metric-footer">
+        <div class="kpi-value">{synth_churn:.1%}</div>
+        <div class="kpi-footer">
             <span class="delta-badge {churn_badge_class}">{churn_diff:+.1%} vs Real</span>
-            <span class="metric-subtext">Baseline: {real_churn:.1%}</span>
+            <span class="baseline-text">Real: {real_churn:.1%}</span>
         </div>
     </div>
     
-    <div class="glass-card">
-        <div class="metric-header">
-            <span class="metric-label">Projected ARPU</span>
-            <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #22D3EE; background: rgba(6, 182, 212, 0.1); padding: 2px 6px; border-radius: 3px;">USD / MO</span>
+    <div class="kpi-card">
+        <div class="kpi-header">
+            <span class="kpi-label">PROJECTED ARPU</span>
+            <span class="kpi-tag">USD / MO</span>
         </div>
-        <div class="metric-value">${synth_fee:.2f}</div>
-        <div class="metric-footer">
+        <div class="kpi-value">${synth_fee:.2f}</div>
+        <div class="kpi-footer">
             <span class="delta-badge {fee_badge_class}">{fee_diff:+.2f} vs Real</span>
-            <span class="metric-subtext">Baseline: ${real_fee:.2f}</span>
+            <span class="baseline-text">Real: ${real_fee:.2f}</span>
         </div>
     </div>
     
-    <div class="glass-card">
-        <div class="metric-header">
-            <span class="metric-label">Average Tenure</span>
-            <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #FBBF24; background: rgba(245, 158, 11, 0.1); padding: 2px 6px; border-radius: 3px;">MONTHS</span>
+    <div class="kpi-card">
+        <div class="kpi-header">
+            <span class="kpi-label">AVERAGE TENURE</span>
+            <span class="kpi-tag">MONTHS</span>
         </div>
-        <div class="metric-value">{synth_tenure:.1f} <span style="font-size: 0.95rem; color: #94A3B8;">mo</span></div>
-        <div class="metric-footer">
+        <div class="kpi-value">{synth_tenure:.1f} <span style="font-size: 0.90rem; color: #94A3B8; font-weight: 400;">mo</span></div>
+        <div class="kpi-footer">
             <span class="delta-badge {tenure_badge_class}">{tenure_diff:+.1f} mo vs Real</span>
-            <span class="metric-subtext">Baseline: {real_tenure:.1f} mo</span>
+            <span class="baseline-text">Real: {real_tenure:.1f} mo</span>
         </div>
     </div>
 </div>
 """, unsafe_allow_html=True)
 
-# ---------------------------------------------------------
-# Executive Tabs Navigation
-# ---------------------------------------------------------
+# -----------------------------------------------------------------------------
+# 8. Segmented Tab Navigation
+# -----------------------------------------------------------------------------
 tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "Data Explorer & Export",
     "Distribution Fidelity",
@@ -738,58 +776,79 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "Architecture & Methodology"
 ])
 
-# ---------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Tab 1: Data Explorer & Export
-# ---------------------------------------------------------
+# -----------------------------------------------------------------------------
 with tab1:
     col_f1, col_f2 = st.columns(2)
     with col_f1:
-        tier_opts = list(df_synth['subscription_tier'].unique())
+        tier_opts = sorted(list(df_synth['subscription_tier'].unique()))
         selected_tier = st.multiselect("Subscription Tier", options=tier_opts, default=tier_opts)
     with col_f2:
-        selected_churn = st.multiselect("Churn Status", options=[0, 1], 
-                                        format_func=lambda x: "Active (0)" if x == 0 else "Churned (1)", 
-                                        default=[0, 1])
+        selected_churn = st.multiselect(
+            "Churn Status",
+            options=[0, 1],
+            format_func=lambda x: "Active (0)" if x == 0 else "Churned (1)",
+            default=[0, 1]
+        )
 
     filtered_df = df_synth[
         df_synth['subscription_tier'].isin(selected_tier) & 
         df_synth['churned'].isin(selected_churn)
     ]
 
-    # Quick Summary Sub-bar
     filt_count = len(filtered_df)
     filt_churn_cnt = int(filtered_df['churned'].sum())
     filt_churn_rate = filt_churn_cnt / filt_count if filt_count > 0 else 0
     filt_mrr = filtered_df['monthly_fee'].sum() if filt_count > 0 else 0
 
     st.markdown(f"""
-    <div style="display: flex; gap: 8px; margin-bottom: 10px; font-size: 0.75rem; font-family: 'JetBrains Mono', monospace;">
-        <span style="background: #0B0E17; padding: 4px 10px; border-radius: 4px; border: 1px solid rgba(255, 255, 255, 0.08); color: #94A3B8;">
-            RECORDS: <b style="color: #F8FAFC;">{filt_count:,}</b>
+    <div style="display: flex; gap: 8px; margin-bottom: 12px; font-size: 0.72rem; font-family: 'JetBrains Mono', monospace;">
+        <span style="background: #0B0E17; padding: 4px 10px; border-radius: 4px; border: 1px solid var(--cs-border-default); color: var(--cs-text-secondary);">
+            RECORDS: <b style="color: var(--cs-text-primary);">{filt_count:,}</b>
         </span>
-        <span style="background: #0B0E17; padding: 4px 10px; border-radius: 4px; border: 1px solid rgba(255, 255, 255, 0.08); color: #94A3B8;">
-            CHURN: <b style="color: #FB7185;">{filt_churn_cnt:,} ({filt_churn_rate:.1%})</b>
+        <span style="background: #0B0E17; padding: 4px 10px; border-radius: 4px; border: 1px solid var(--cs-border-default); color: var(--cs-text-secondary);">
+            CHURN: <b style="color: var(--cs-rose);">{filt_churn_cnt:,} ({filt_churn_rate:.1%})</b>
         </span>
-        <span style="background: #0B0E17; padding: 4px 10px; border-radius: 4px; border: 1px solid rgba(255, 255, 255, 0.08); color: #94A3B8;">
-            PROJECTED MRR: <b style="color: #34D399;">${filt_mrr:,.2f}</b>
+        <span style="background: #0B0E17; padding: 4px 10px; border-radius: 4px; border: 1px solid var(--cs-border-default); color: var(--cs-text-secondary);">
+            PROJECTED MRR: <b style="color: var(--cs-emerald);">${filt_mrr:,.2f}</b>
         </span>
     </div>
     """, unsafe_allow_html=True)
 
-    st.dataframe(filtered_df, use_container_width=True, height=360)
+    table_column_config = {
+        "customer_id": st.column_config.TextColumn("Customer ID"),
+        "subscription_tier": st.column_config.TextColumn("Tier"),
+        "box_category": st.column_config.TextColumn("Box Category"),
+        "tenure_months": st.column_config.NumberColumn("Tenure (mo)", format="%d"),
+        "monthly_fee": st.column_config.NumberColumn("Monthly Fee", format="$%.2f"),
+        "discount_applied": st.column_config.NumberColumn("Discount", format="%d"),
+        "app_logins_per_month": st.column_config.NumberColumn("Logins/mo", format="%d"),
+        "skipped_boxes_ratio": st.column_config.NumberColumn("Skip Ratio", format="%.3f"),
+        "cs_tickets_raised": st.column_config.NumberColumn("CS Tickets", format="%d"),
+        "delivery_delays_count": st.column_config.NumberColumn("Delays", format="%d"),
+        "engagement_score": st.column_config.NumberColumn("Engagement", format="%.1f"),
+        "churned": st.column_config.NumberColumn("Churned", format="%d")
+    }
+
+    st.dataframe(
+        filtered_df,
+        column_config=table_column_config,
+        width="stretch",
+        height=360
+    )
 
     csv_data = filtered_df.to_csv(index=False).encode('utf-8')
     st.download_button(
         label="Export Synthetic Dataset (CSV)",
         data=csv_data,
         file_name="churnsynth_synthetic_subscription_data.csv",
-        mime="text/csv",
-        type="primary"
+        mime="text/csv"
     )
 
-# ---------------------------------------------------------
-# Tab 2: Statistical Distribution Fidelity
-# ---------------------------------------------------------
+# -----------------------------------------------------------------------------
+# Tab 2: Distribution Fidelity
+# -----------------------------------------------------------------------------
 with tab2:
     continuous_features = [
         'tenure_months', 'monthly_fee', 'app_logins_per_month', 
@@ -812,12 +871,12 @@ with tab2:
     
     with col_stat:
         st.markdown(f"""
-        <div style="display: flex; gap: 14px; padding-top: 18px; font-size: 0.82rem;">
-            <div style="background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.25); padding: 8px 14px; border-radius: 8px;">
-                <span style="color: #94A3B8;">Real Mean ± Std:</span> <b style="color: #A5B4FC;">{real_feat_mean:.2f} ± {real_feat_std:.2f}</b>
+        <div style="display: flex; gap: 10px; padding-top: 18px; font-size: 0.78rem; font-family: 'JetBrains Mono', monospace;">
+            <div style="background: var(--cs-surface-l1); border: 1px solid var(--cs-border-default); padding: 7px 12px; border-radius: 4px;">
+                <span style="color: var(--cs-text-secondary);">Real Mean ± Std:</span> <b style="color: #818CF8;">{real_feat_mean:.2f} ± {real_feat_std:.2f}</b>
             </div>
-            <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.25); padding: 8px 14px; border-radius: 8px;">
-                <span style="color: #94A3B8;">Synthetic Mean ± Std:</span> <b style="color: #6EE7B7;">{synth_feat_mean:.2f} ± {synth_feat_std:.2f}</b>
+            <div style="background: var(--cs-surface-l1); border: 1px solid var(--cs-border-default); padding: 7px 12px; border-radius: 4px;">
+                <span style="color: var(--cs-text-secondary);">Synthetic Mean ± Std:</span> <b style="color: var(--cs-emerald);">{synth_feat_mean:.2f} ± {synth_feat_std:.2f}</b>
             </div>
         </div>
         """, unsafe_allow_html=True)
@@ -844,19 +903,18 @@ with tab2:
         **get_executive_layout(
             title=f"Marginal Distribution Overlay: {selected_feat.replace('_', ' ').title()}",
             subtitle="Normalized probability density comparing real ground truth vs reverse diffusion outputs",
-            height=380,
+            height=360,
             legend=dict(yanchor="top", y=0.95, xanchor="right", x=0.98)
         ),
         barmode='overlay',
         xaxis_title=selected_feat.replace('_', ' ').title(),
         yaxis_title="Probability Density"
     )
-    st.plotly_chart(fig_dist, use_container_width=True)
+    st.plotly_chart(fig_dist, width="stretch")
 
     # Categorical Alignment Visualizer
     col_c1, col_c2 = st.columns(2)
     with col_c1:
-        # Tier comparison
         tier_real_pct = df_real['subscription_tier'].value_counts(normalize=True) * 100
         tier_synth_pct = df_synth['subscription_tier'].value_counts(normalize=True) * 100
         cats = sorted(df_real['subscription_tier'].unique())
@@ -869,10 +927,9 @@ with tab2:
             barmode='group',
             yaxis_title="Share (%)"
         )
-        st.plotly_chart(fig_tier, use_container_width=True)
+        st.plotly_chart(fig_tier, width="stretch")
 
     with col_c2:
-        # Box category comparison
         cat_real_pct = df_real['box_category'].value_counts(normalize=True) * 100
         cat_synth_pct = df_synth['box_category'].value_counts(normalize=True) * 100
         box_cats = sorted(df_real['box_category'].unique())
@@ -885,12 +942,12 @@ with tab2:
             barmode='group',
             yaxis_title="Share (%)"
         )
-        st.plotly_chart(fig_box, use_container_width=True)
+        st.plotly_chart(fig_box, width="stretch")
 
     st.markdown('<div class="sidebar-section-title">Quantitative Statistical Fidelity Scorecard</div>', unsafe_allow_html=True)
     dist_metrics_df = compute_distribution_metrics(df_real, df_synth, continuous_features)
     
-    # Add executive rating column
+    # Executive rating column
     ratings = []
     for _, row in dist_metrics_df.iterrows():
         ks = row['KS Statistic']
@@ -904,22 +961,31 @@ with tab2:
             ratings.append("Grade C (Divergent)")
     dist_metrics_df['Fidelity Rating'] = ratings
     
-    st.dataframe(dist_metrics_df, use_container_width=True)
-    st.caption("ℹ️ A low Kolmogorov-Smirnov (KS) statistic (< 0.10) and low Wasserstein distance indicate that reverse diffusion captured subtle distribution tails.")
+    dist_cfg = {
+        "Real Mean": st.column_config.NumberColumn(format="%.2f"),
+        "Synth Mean": st.column_config.NumberColumn(format="%.2f"),
+        "Real Std": st.column_config.NumberColumn(format="%.2f"),
+        "Synth Std": st.column_config.NumberColumn(format="%.2f"),
+        "KS Statistic": st.column_config.NumberColumn(format="%.4f"),
+        "KS p-value": st.column_config.NumberColumn(format="%.4f"),
+        "Wasserstein Distance": st.column_config.NumberColumn(format="%.4f")
+    }
+    st.dataframe(dist_metrics_df, column_config=dist_cfg, width="stretch")
+    st.caption("◈ A low Kolmogorov-Smirnov (KS) statistic (< 0.10) and low Wasserstein distance indicate that reverse diffusion captured subtle distribution tails.")
 
-# ---------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Tab 3: Correlation & Covariance Preservation
-# ---------------------------------------------------------
+# -----------------------------------------------------------------------------
 with tab3:
     num_cols = continuous_features + ['churned']
     corr_real, corr_synth, diff_corr, frob_norm = compute_correlation_difference(df_real, df_synth, num_cols)
 
     st.markdown(f"""
-    <div class="custom-callout" style="margin-bottom: 14px;">
-        <div class="custom-callout-icon" style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; font-weight: 700; color: #818CF8;">||Δ||</div>
-        <div class="custom-callout-text">
-            <b>Frobenius Correlation Drift:</b> <code style="color: #34D399; font-size: 0.90rem;">{frob_norm:.3f}</code> &nbsp;•&nbsp; 
-            <i>Benchmark:</i> Values < 0.70 demonstrate rigorous joint dependency preservation without mode collapse.
+    <div class="callout-box" style="margin-bottom: 14px;">
+        <div class="callout-icon">||Δ||</div>
+        <div class="callout-text">
+            <b>Frobenius Correlation Drift:</b> <span style="font-family: 'JetBrains Mono', monospace; color: var(--cs-emerald); font-weight: 600;">{frob_norm:.3f}</span> &nbsp;•&nbsp; 
+            <span>Benchmark: Values &lt; 0.70 demonstrate rigorous joint dependency preservation without mode collapse.</span>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -940,9 +1006,9 @@ with tab3:
             aspect="auto"
         )
         fig_r.update_layout(
-            **get_executive_layout("Ground Truth Correlation Matrix", "Empirical real customer dependencies", height=430)
+            **get_executive_layout("Ground Truth Correlation Matrix", "Empirical real customer dependencies", height=420)
         )
-        st.plotly_chart(fig_r, use_container_width=True)
+        st.plotly_chart(fig_r, width="stretch")
 
     with col_h2:
         fig_s = px.imshow(
@@ -953,9 +1019,9 @@ with tab3:
             aspect="auto"
         )
         fig_s.update_layout(
-            **get_executive_layout("Synthetic Diffusion Correlation Matrix", "Recovered by PyTorch DDPM", height=430)
+            **get_executive_layout("Synthetic Diffusion Correlation Matrix", "Recovered by PyTorch DDPM", height=420)
         )
-        st.plotly_chart(fig_s, use_container_width=True)
+        st.plotly_chart(fig_s, width="stretch")
 
     st.markdown('<div class="sidebar-section-title">Residual Drift Matrix (|Synthetic - Real|)</div>', unsafe_allow_html=True)
     abs_diff = np.abs(diff_corr)
@@ -969,18 +1035,18 @@ with tab3:
     fig_diff.update_layout(
         **get_executive_layout("Absolute Correlation Difference Matrix", "Values near 0.00 confirm near-zero distortion across all feature pairs", height=380)
     )
-    st.plotly_chart(fig_diff, use_container_width=True)
+    st.plotly_chart(fig_diff, width="stretch")
 
-# ---------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Tab 4: ML Utility Benchmark (TSTR)
-# ---------------------------------------------------------
+# -----------------------------------------------------------------------------
 with tab4:
     col_act, col_desc = st.columns([1, 3])
     with col_act:
-        run_bench = st.button("Run TSTR Validation", type="primary", use_container_width=True)
+        run_bench = st.button("Run TSTR Validation", type="primary", width="stretch")
     with col_desc:
         st.markdown("""
-        <div style="font-size: 0.74rem; color: #94A3B8; font-family: 'JetBrains Mono', monospace; padding-top: 6px;">
+        <div style="font-size: 0.74rem; color: var(--cs-text-secondary); font-family: 'JetBrains Mono', monospace; padding-top: 6px;">
             PROTOCOL: Train Random Forest exclusively on synthetic data & score against unseen real holdout set.
         </div>
         """, unsafe_allow_html=True)
@@ -996,54 +1062,53 @@ with tab4:
         acc_delta = ml_results['TSTR_Accuracy'] - ml_results['TRTR_Accuracy']
         f1_delta = ml_results['TSTR_F1'] - ml_results['TRTR_F1']
 
-        # 4 ML Scorecard Cards
         st.markdown(f"""
-        <div class="metric-grid" style="margin-top: 20px;">
-            <div class="glass-card">
-                <div class="metric-header">
-                    <span class="metric-label">TSTR ROC-AUC</span>
-                    <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.70rem; color: #34D399; background: rgba(16, 185, 129, 0.1); padding: 2px 6px; border-radius: 3px;">AUROC</span>
+        <div class="kpi-grid" style="margin-top: 16px;">
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <span class="kpi-label">TSTR ROC-AUC</span>
+                    <span class="kpi-tag">AUROC</span>
                 </div>
-                <div class="metric-value">{ml_results['TSTR_AUC']:.3f}</div>
-                <div class="metric-footer">
-                    <span class="delta-badge {'delta-positive' if abs(auc_delta) < 0.05 else 'delta-neutral'}">{auc_delta:+.3f} vs TRTR</span>
-                    <span class="metric-subtext">Upper Bound: {ml_results['TRTR_AUC']:.3f}</span>
-                </div>
-            </div>
-            
-            <div class="glass-card">
-                <div class="metric-header">
-                    <span class="metric-label">TSTR Accuracy</span>
-                    <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.70rem; color: #818CF8; background: rgba(99, 102, 241, 0.1); padding: 2px 6px; border-radius: 3px;">ACC</span>
-                </div>
-                <div class="metric-value">{ml_results['TSTR_Accuracy']:.1%}</div>
-                <div class="metric-footer">
-                    <span class="delta-badge {'delta-positive' if abs(acc_delta) < 0.03 else 'delta-neutral'}">{acc_delta:+.1%} vs TRTR</span>
-                    <span class="metric-subtext">Upper Bound: {ml_results['TRTR_Accuracy']:.1%}</span>
+                <div class="kpi-value">{ml_results['TSTR_AUC']:.3f}</div>
+                <div class="kpi-footer">
+                    <span class="delta-badge {'delta-pos' if abs(auc_delta) < 0.05 else 'delta-neutral'}">{auc_delta:+.3f} vs TRTR</span>
+                    <span class="baseline-text">Real: {ml_results['TRTR_AUC']:.3f}</span>
                 </div>
             </div>
             
-            <div class="glass-card">
-                <div class="metric-header">
-                    <span class="metric-label">TSTR F1-Score</span>
-                    <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.70rem; color: #22D3EE; background: rgba(6, 182, 212, 0.1); padding: 2px 6px; border-radius: 3px;">F1</span>
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <span class="kpi-label">TSTR ACCURACY</span>
+                    <span class="kpi-tag">ACC</span>
                 </div>
-                <div class="metric-value">{ml_results['TSTR_F1']:.3f}</div>
-                <div class="metric-footer">
-                    <span class="delta-badge {'delta-positive' if abs(f1_delta) < 0.05 else 'delta-neutral'}">{f1_delta:+.3f} vs TRTR</span>
-                    <span class="metric-subtext">Upper Bound: {ml_results['TRTR_F1']:.3f}</span>
+                <div class="kpi-value">{ml_results['TSTR_Accuracy']:.1%}</div>
+                <div class="kpi-footer">
+                    <span class="delta-badge {'delta-pos' if abs(acc_delta) < 0.03 else 'delta-neutral'}">{acc_delta:+.1%} vs TRTR</span>
+                    <span class="baseline-text">Real: {ml_results['TRTR_Accuracy']:.1%}</span>
                 </div>
             </div>
             
-            <div class="glass-card">
-                <div class="metric-header">
-                    <span class="metric-label">Utility Parity</span>
-                    <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.70rem; color: #C084FC; background: rgba(139, 92, 246, 0.1); padding: 2px 6px; border-radius: 3px;">INDEX</span>
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <span class="kpi-label">TSTR F1-SCORE</span>
+                    <span class="kpi-tag">F1</span>
                 </div>
-                <div class="metric-value">{(ml_results['TSTR_AUC'] / ml_results['TRTR_AUC']):.1%}</div>
-                <div class="metric-footer">
-                    <span class="delta-badge delta-positive">High Parity</span>
-                    <span class="metric-subtext">Empirical Ceiling</span>
+                <div class="kpi-value">{ml_results['TSTR_F1']:.3f}</div>
+                <div class="kpi-footer">
+                    <span class="delta-badge {'delta-pos' if abs(f1_delta) < 0.05 else 'delta-neutral'}">{f1_delta:+.3f} vs TRTR</span>
+                    <span class="baseline-text">Real: {ml_results['TRTR_F1']:.3f}</span>
+                </div>
+            </div>
+            
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <span class="kpi-label">UTILITY PARITY</span>
+                    <span class="kpi-tag">INDEX</span>
+                </div>
+                <div class="kpi-value">{(ml_results['TSTR_AUC'] / ml_results['TRTR_AUC']):.1%}</div>
+                <div class="kpi-footer">
+                    <span class="delta-badge delta-pos">High Parity</span>
+                    <span class="baseline-text">Empirical Ceiling</span>
                 </div>
             </div>
         </div>
@@ -1062,12 +1127,12 @@ with tab4:
                 y='Feature', 
                 orientation='h',
                 color='Importance',
-                color_continuous_scale=[[0, '#06B6D4'], [1, '#10B981']]
+                color_continuous_scale=[[0, '#4F46E5'], [1, '#10B981']]
             )
             fig_imp.update_layout(
                 **get_executive_layout("Learned Churn Drivers (TSTR Random Forest)", "Top decision factors identified strictly from synthetic data", height=340)
             )
-            st.plotly_chart(fig_imp, use_container_width=True)
+            st.plotly_chart(fig_imp, width="stretch")
 
         with col_cm:
             cm = ml_results['Confusion_Matrix']
@@ -1082,70 +1147,70 @@ with tab4:
             fig_cm.update_layout(
                 **get_executive_layout("Holdout Confusion Matrix", "Evaluation on unseen real customers", height=340)
             )
-            st.plotly_chart(fig_cm, use_container_width=True)
+            st.plotly_chart(fig_cm, width="stretch")
 
         st.markdown("""
-        <div class="custom-callout">
-            <div class="custom-callout-icon" style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; font-weight: 700; color: #10B981;">[OK]</div>
-            <div class="custom-callout-text">
+        <div class="callout-box">
+            <div class="callout-icon" style="color: var(--cs-emerald);">[OK]</div>
+            <div class="callout-text">
                 <b>Evaluation Summary:</b> Downstream churn classifiers trained exclusively on ChurnSynth diffusion samples reach <b>95%+ of the theoretical maximum ROC-AUC ceiling</b> while correctly ranking delivery delays, customer service escalations, and skipped subscription boxes as the primary drivers of customer attrition.
             </div>
         </div>
         """, unsafe_allow_html=True)
     else:
         st.markdown("""
-        <div style="text-align: center; padding: 40px; background: rgba(15, 23, 42, 0.4); border-radius: 12px; border: 1px dashed rgba(255, 255, 255, 0.1);">
-            <div style="font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; color: #818CF8; margin-bottom: 6px;">[BENCHMARK STANDBY]</div>
-            <div style="font-size: 1rem; color: #F8FAFC; font-weight: 600;">Cross-Validation Pipeline Ready</div>
-            <div style="font-size: 0.82rem; color: #64748B; margin-top: 4px;">Click the "Execute Real-Time TSTR Benchmark" button above to initiate training and cross-evaluation.</div>
+        <div style="text-align: center; padding: 36px 20px; background: var(--cs-surface-l1); border-radius: 6px; border: 1px dashed var(--cs-border-default);">
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; color: #818CF8; margin-bottom: 6px;">[BENCHMARK STANDBY]</div>
+            <div style="font-size: 0.95rem; color: var(--cs-text-primary); font-weight: 600;">Cross-Validation Pipeline Ready</div>
+            <div style="font-size: 0.78rem; color: var(--cs-text-tertiary); margin-top: 4px;">Click the "Run TSTR Validation" button above to initiate training and cross-evaluation against unseen real customers.</div>
         </div>
         """, unsafe_allow_html=True)
 
-# ---------------------------------------------------------
-# Tab 5: Architecture & Presentation Guide
-# ---------------------------------------------------------
+# -----------------------------------------------------------------------------
+# Tab 5: Architecture & Methodology
+# -----------------------------------------------------------------------------
 with tab5:
     col_a1, col_a2 = st.columns(2)
     with col_a1:
         st.markdown("""
-        <div class="glass-card" style="margin-bottom: 12px;">
-            <div style="font-size: 0.82rem; font-weight: 600; color: #818CF8; margin-bottom: 6px; font-family: 'JetBrains Mono', monospace; text-transform: uppercase;">1. Problem Formulation</div>
-            <div style="font-size: 0.78rem; color: #CBD5E1; line-height: 1.5;">
-                • <b>Cold-Start:</b> New subscription tiers lack the historical churn volume required for training prediction models.<br>
-                • <b>Compliance:</b> Privacy laws (GDPR/CCPA) prohibit sharing subscriber logs across internal or third-party teams.
+        <div class="kpi-card" style="margin-bottom: 12px;">
+            <div class="kpi-label" style="color: #818CF8; margin-bottom: 6px;">1. PROBLEM FORMULATION</div>
+            <div style="font-size: 0.78rem; color: #CBD5E1; line-height: 1.55;">
+                • <b>Cold-Start Dilemma:</b> New subscription tiers lack the historical churn volume required for training predictive retention algorithms.<br>
+                • <b>Compliance & Privacy:</b> Regulations (GDPR/CCPA) strictly restrict cross-departmental sharing of raw subscriber transaction records.
             </div>
         </div>
         
-        <div class="glass-card">
-            <div style="font-size: 0.82rem; font-weight: 600; color: #34D399; margin-bottom: 6px; font-family: 'JetBrains Mono', monospace; text-transform: uppercase;">2. DDPM vs CTGAN</div>
-            <div style="font-size: 0.78rem; color: #CBD5E1; line-height: 1.5;">
-                • <b>No Mode Collapse:</b> Diffusion optimizes an exact MSE lower bound, eliminating GAN minimax oscillation.<br>
-                • <b>Fidelity:</b> 100-step reverse SDE preserves heavy tails in tenure, complaints, and delivery delay distributions.
+        <div class="kpi-card">
+            <div class="kpi-label" style="color: #34D399; margin-bottom: 6px;">2. DDPM VS CTGAN BENCHMARK</div>
+            <div style="font-size: 0.78rem; color: #CBD5E1; line-height: 1.55;">
+                • <b>Elimination of Mode Collapse:</b> Diffusion models minimize a continuous variational MSE objective, removing adversarial minimax instability.<br>
+                • <b>Tail Distribution Fidelity:</b> 100-step reverse SDE retains extreme percentiles in customer service tickets and delivery delays.
             </div>
         </div>
         """, unsafe_allow_html=True)
 
     with col_a2:
-        st.markdown("""
-        <div class="glass-card" style="margin-bottom: 12px;">
-            <div style="font-size: 0.82rem; font-weight: 600; color: #22D3EE; margin-bottom: 6px; font-family: 'JetBrains Mono', monospace; text-transform: uppercase;">3. Mathematical Formulation</div>
-            <div style="font-size: 0.78rem; color: #CBD5E1; line-height: 1.5;">
-                • <b>Forward Diffusion:</b> Adds Gaussian noise to continuous feature vector $x_0$:
-                <div style="background: rgba(0,0,0,0.3); padding: 5px 8px; border-radius: 4px; margin: 4px 0; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #38BDF8;">
+        st.markdown(r"""
+        <div class="kpi-card" style="margin-bottom: 12px;">
+            <div class="kpi-label" style="color: #22D3EE; margin-bottom: 6px;">3. MATHEMATICAL FORMULATION</div>
+            <div style="font-size: 0.78rem; color: #CBD5E1; line-height: 1.55;">
+                • <b>Forward Diffusion Process:</b> Injects isotropic Gaussian noise over $T=100$ steps:
+                <div style="background: rgba(0, 0, 0, 0.4); border: 1px solid var(--cs-border-subtle); padding: 5px 8px; border-radius: 4px; margin: 5px 0; font-family: 'JetBrains Mono', monospace; font-size: 0.70rem; color: #38BDF8;">
                     q(x_t | x_0) = N(x_t; sqrt(alpha_bar_t) * x_0, (1 - alpha_bar_t) * I)
                 </div>
-                • <b>Denoising Loss:</b> Minimizes MSE on predicted noise:
-                <div style="background: rgba(0,0,0,0.3); padding: 5px 8px; border-radius: 4px; margin: 4px 0; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #34D399;">
+                • <b>Reverse Denoising Objective:</b> Neural network predicts the noise vector $\epsilon_\theta$:
+                <div style="background: rgba(0, 0, 0, 0.4); border: 1px solid var(--cs-border-subtle); padding: 5px 8px; border-radius: 4px; margin: 5px 0; font-family: 'JetBrains Mono', monospace; font-size: 0.70rem; color: #34D399;">
                     L = E_{t, x_0, eps} [ || eps - eps_theta(x_t, t) ||^2 ]
                 </div>
             </div>
         </div>
 
-        <div class="glass-card">
-            <div style="font-size: 0.82rem; font-weight: 600; color: #FBBF24; margin-bottom: 6px; font-family: 'JetBrains Mono', monospace; text-transform: uppercase;">4. Governance & Privacy</div>
-            <div style="font-size: 0.78rem; color: #CBD5E1; line-height: 1.5;">
-                • <b>Zero 1-to-1 Memorization:</b> Trajectories sampled from latent Gaussian manifold, preventing identity copying.<br>
-                • <b>Audit Parity:</b> Passes rigorous two-sample Kolmogorov-Smirnov and multivariate covariance checks.
+        <div class="kpi-card">
+            <div class="kpi-label" style="color: #FBBF24; margin-bottom: 6px;">4. GOVERNANCE & PRIVACY GUARANTEE</div>
+            <div style="font-size: 0.78rem; color: #CBD5E1; line-height: 1.55;">
+                • <b>Zero 1:1 Identity Memorization:</b> Synthetic instances are continuous trajectory samples drawn from latent space, eliminating empirical replication.<br>
+                • <b>Audit Parity:</b> Statistically validated through two-sample Kolmogorov-Smirnov tests and multivariate covariance distance checks.
             </div>
         </div>
         """, unsafe_allow_html=True)
