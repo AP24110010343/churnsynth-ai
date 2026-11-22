@@ -24,12 +24,11 @@ st.markdown("""
     .main-title {
         font-size: 2.3rem;
         font-weight: 700;
-        color: #1E293B;
         margin-bottom: 0.2rem;
     }
     .sub-title {
         font-size: 1.05rem;
-        color: #475569;
+        opacity: 0.85;
         margin-bottom: 1.2rem;
     }
     .badge {
