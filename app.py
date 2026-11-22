@@ -15,8 +15,8 @@ from evaluate import compute_distribution_metrics, compute_correlation_differenc
 # Page Configuration
 # ---------------------------------------------------------
 st.set_page_config(
-    page_title="ChurnSynth AI | Tabular Diffusion Studio",
-    page_icon="📦",
+    page_title="ChurnSynth Platform | Tabular Diffusion Engine",
+    page_icon="◈",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -63,84 +63,113 @@ header[data-testid="stHeader"] {
     background: #334155;
 }
 
-/* Brand Bar */
-.brand-container {
+/* Enterprise Top Bar */
+.top-nav-bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-bottom: 12px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-    margin-bottom: 18px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    margin-bottom: 20px;
 }
 
-.brand-left {
+.nav-breadcrumbs {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.76rem;
 }
 
-.brand-badge {
+.nav-org { color: #64748B; font-weight: 500; }
+.nav-slash { color: #334155; }
+.nav-product { color: #94A3B8; }
+.nav-current { color: #F1F5F9; font-weight: 600; }
+
+.nav-status-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.status-pill {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    background: rgba(99, 102, 241, 0.12);
-    border: 1px solid rgba(99, 102, 241, 0.3);
-    color: #A5B4FC;
+    background: #0B0F17;
+    border: 1px solid #1E293B;
+    color: #94A3B8;
+    font-family: 'JetBrains Mono', monospace;
     font-size: 0.72rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    padding: 3px 10px;
-    border-radius: 20px;
+    font-weight: 500;
+    padding: 3px 9px;
+    border-radius: 4px;
 }
 
-.live-status {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: rgba(16, 185, 129, 0.1);
-    border: 1px solid rgba(16, 185, 129, 0.25);
-    color: #34D399;
-    font-size: 0.78rem;
-    font-weight: 600;
-    padding: 4px 12px;
-    border-radius: 20px;
-}
-
-.status-dot {
-    width: 7px;
-    height: 7px;
+.status-dot-solid {
+    width: 6px;
+    height: 6px;
     background-color: #10B981;
     border-radius: 50%;
-    box-shadow: 0 0 10px #10B981;
-    animation: pulse-glow 2s infinite ease-in-out;
 }
 
-@keyframes pulse-glow {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.35; transform: scale(0.85); }
+.version-tag {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #64748B;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.70rem;
+    padding: 3px 8px;
+    border-radius: 4px;
 }
 
 /* Hero Title & Typography */
 .hero-title {
-    font-size: 2.25rem;
-    font-weight: 800;
-    letter-spacing: -0.03em;
+    font-size: 2.15rem;
+    font-weight: 700;
+    letter-spacing: -0.025em;
     line-height: 1.15;
-    background: linear-gradient(180deg, #FFFFFF 0%, #CBD5E1 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-top: 4px;
-    margin-bottom: 8px;
+    color: #F8FAFC;
+    margin-top: 2px;
+    margin-bottom: 6px;
 }
 
 .hero-subtitle {
-    font-size: 0.95rem;
+    font-size: 0.92rem;
     color: #94A3B8;
-    line-height: 1.55;
-    max-width: 980px;
-    margin-bottom: 18px;
+    line-height: 1.5;
+    max-width: 960px;
+    margin-bottom: 16px;
     font-weight: 400;
+}
+
+/* Metadata Tag Badges */
+.enterprise-tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 24px;
+}
+
+.tag-item {
+    display: inline-flex;
+    align-items: center;
+    background: #0B0F17;
+    border: 1px solid #1E293B;
+    color: #E2E8F0;
+    padding: 4px 10px;
+    border-radius: 5px;
+    font-size: 0.75rem;
+}
+
+.tag-label {
+    color: #64748B;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-right: 6px;
 }
 
 /* Metadata Pill Badges */
@@ -557,33 +586,39 @@ def get_executive_layout(title="", subtitle="", height=420, legend=None):
     )
 
 # ---------------------------------------------------------
-# Brand Header & Micro-Pills
+# Enterprise Top Navigation & Metadata
 # ---------------------------------------------------------
 st.markdown("""
-<div class="brand-container">
-    <div class="brand-left">
-        <span class="brand-badge">Enterprise Synthetic Studio</span>
-        <span style="font-size: 0.82rem; color: #64748B;">v2.4 LTS</span>
+<div class="top-nav-bar">
+    <div class="nav-breadcrumbs">
+        <span class="nav-org">ChurnSynth Platform</span>
+        <span class="nav-slash">/</span>
+        <span class="nav-product">Retail Analytics</span>
+        <span class="nav-slash">/</span>
+        <span class="nav-current">Subscription Churn Simulator</span>
     </div>
-    <div class="live-status">
-        <span class="status-dot"></span>
-        <span>DDPM Engine: Active</span>
+    <div class="nav-status-group">
+        <span class="status-pill">
+            <span class="status-dot-solid"></span>
+            Model Ready
+        </span>
+        <span class="version-tag">v2.4 LTS</span>
     </div>
 </div>
 """, unsafe_allow_html=True)
 
-st.markdown('<div class="hero-title">ChurnSynth AI: Tabular Diffusion Studio</div>', unsafe_allow_html=True)
+st.markdown('<div class="hero-title">Subscription Churn Simulation & Synthesis</div>', unsafe_allow_html=True)
 st.markdown("""
 <div class="hero-subtitle">
-Synthesizing high-fidelity customer lifecycles and churn records via continuous Gaussian reverse diffusion. 
-Train, validate, and stress-test downstream predictive ML models with zero exposure of sensitive customer PII.
+High-fidelity customer lifecycle and churn simulation powered by continuous Gaussian reverse diffusion.
+Designed to validate downstream predictive ML pipelines without customer data exposure.
 </div>
 
-<div class="pill-group">
-    <span class="pill-item pill-indigo">🏢 Domain: Retail Subscription Boxes</span>
-    <span class="pill-item pill-emerald">🧠 Generator: PyTorch Tabular DDPM</span>
-    <span class="pill-item pill-cyan">⚡ Sampling: Continuous Reverse SDE</span>
-    <span class="pill-item pill-violet">🛡️ Compliance: Zero-PII / GDPR Article 25</span>
+<div class="enterprise-tag-list">
+    <span class="tag-item"><span class="tag-label">Domain</span>Retail (Subscription Boxes)</span>
+    <span class="tag-item"><span class="tag-label">Model</span>Tabular DDPM (PyTorch)</span>
+    <span class="tag-item"><span class="tag-label">Sampling</span>Reverse Gaussian SDE (T=100)</span>
+    <span class="tag-item"><span class="tag-label">Protocol</span>TSTR Holdout Benchmark</span>
 </div>
 """, unsafe_allow_html=True)
 
@@ -593,7 +628,7 @@ Train, validate, and stress-test downstream predictive ML models with zero expos
 with st.sidebar:
     st.markdown("""
     <div class="sidebar-title">
-        <span>⚙️ Generator Controls</span>
+        <span>Generator Parameters</span>
     </div>
     <div class="sidebar-subtitle">
         Configure diffusion parameters for reverse Gaussian sampling:
@@ -629,15 +664,15 @@ with st.sidebar:
     st.markdown('<div class="sidebar-section-title">Differential Privacy & Governance</div>', unsafe_allow_html=True)
     st.markdown("""
     <div style="font-size: 0.78rem; color: #94A3B8; line-height: 1.45; margin-bottom: 16px; background: rgba(16, 185, 129, 0.05); padding: 10px; border-radius: 8px; border: 1px solid rgba(16, 185, 129, 0.15);">
-        🔒 <b>Membership Inference Immunity:</b> Synthetic rows represent probabilistic trajectories rather than 1:1 records of real subscribers.
+        <b>Privacy Guarantee:</b> Synthetic rows represent probabilistic trajectories rather than 1:1 records of real subscribers (Membership Inference Protection).
     </div>
     """, unsafe_allow_html=True)
     
-    if st.button("🚀 Sample New Synthetic Cohort", use_container_width=True, type="primary"):
+    if st.button("Sample Synthetic Cohort", use_container_width=True, type="primary"):
         with st.spinner(f"Executing reverse diffusion across 100 timesteps for {n_samples:,} records..."):
             vectors = ddpm.sample(n_samples=n_samples, data_dim=data_dim, temperature=temperature)
             st.session_state['synthetic_df'] = preprocessor.inverse_transform(vectors)
-            st.toast(f"✅ Generated {n_samples:,} synthetic records via Tabular DDPM!", icon="⚡")
+            st.toast(f"Generated {n_samples:,} synthetic records via Tabular DDPM.")
 
 df_synth = st.session_state['synthetic_df']
 
@@ -665,20 +700,20 @@ st.markdown(f"""
 <div class="metric-grid">
     <div class="glass-card">
         <div class="metric-header">
-            <span class="metric-label">Synthetic Cohort Size</span>
-            <div class="metric-icon-box" style="background: rgba(99, 102, 241, 0.15); color: #818CF8;">👥</div>
+            <span class="metric-label">Cohort Volume</span>
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #818CF8; background: rgba(99, 102, 241, 0.1); padding: 2px 6px; border-radius: 3px;">N-RECORDS</span>
         </div>
         <div class="metric-value">{synth_count:,}</div>
         <div class="metric-footer">
-            <span class="delta-badge delta-neutral">Active Cohort</span>
-            <span class="metric-subtext">Reverse SDE Sampled</span>
+            <span class="delta-badge delta-neutral">Active Sample</span>
+            <span class="metric-subtext">Reverse SDE</span>
         </div>
     </div>
     
     <div class="glass-card">
         <div class="metric-header">
             <span class="metric-label">Simulated Churn Rate</span>
-            <div class="metric-icon-box" style="background: rgba(16, 185, 129, 0.15); color: #34D399;">📉</div>
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #34D399; background: rgba(16, 185, 129, 0.1); padding: 2px 6px; border-radius: 3px;">TARGET</span>
         </div>
         <div class="metric-value">{synth_churn:.1%}</div>
         <div class="metric-footer">
@@ -689,8 +724,8 @@ st.markdown(f"""
     
     <div class="glass-card">
         <div class="metric-header">
-            <span class="metric-label">Simulated ARPU / Fee</span>
-            <div class="metric-icon-box" style="background: rgba(6, 182, 212, 0.15); color: #22D3EE;">💳</div>
+            <span class="metric-label">Projected ARPU</span>
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #22D3EE; background: rgba(6, 182, 212, 0.1); padding: 2px 6px; border-radius: 3px;">USD / MO</span>
         </div>
         <div class="metric-value">${synth_fee:.2f}</div>
         <div class="metric-footer">
@@ -701,10 +736,10 @@ st.markdown(f"""
     
     <div class="glass-card">
         <div class="metric-header">
-            <span class="metric-label">Avg Customer Tenure</span>
-            <div class="metric-icon-box" style="background: rgba(245, 158, 11, 0.15); color: #FBBF24;">⏱️</div>
+            <span class="metric-label">Average Tenure</span>
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #FBBF24; background: rgba(245, 158, 11, 0.1); padding: 2px 6px; border-radius: 3px;">MONTHS</span>
         </div>
-        <div class="metric-value">{synth_tenure:.1f} <span style="font-size: 1rem; color: #94A3B8;">mo</span></div>
+        <div class="metric-value">{synth_tenure:.1f} <span style="font-size: 0.95rem; color: #94A3B8;">mo</span></div>
         <div class="metric-footer">
             <span class="delta-badge {tenure_badge_class}">{tenure_diff:+.1f} mo vs Real</span>
             <span class="metric-subtext">Baseline: {real_tenure:.1f} mo</span>
@@ -717,11 +752,11 @@ st.markdown(f"""
 # Executive Tabs Navigation
 # ---------------------------------------------------------
 tab1, tab2, tab3, tab4, tab5 = st.tabs([
-    "📋 Data Explorer & Export",
-    "📊 Statistical Distribution Fidelity",
-    "🔗 Correlation & Covariance Matrix",
-    "🤖 ML Utility Benchmark (TSTR)",
-    "📑 Architecture & Presentation Guide"
+    "Data Explorer & Export",
+    "Distribution Fidelity",
+    "Correlation Matrix",
+    "ML Utility Benchmark",
+    "Architecture & Methodology"
 ])
 
 # ---------------------------------------------------------
@@ -777,7 +812,7 @@ with tab1:
     with col_btn:
         csv_data = filtered_df.to_csv(index=False).encode('utf-8')
         st.download_button(
-            label="📥 Export Synthetic Dataset (CSV)",
+            label="Export Synthetic Dataset (CSV)",
             data=csv_data,
             file_name="churnsynth_synthetic_subscription_data.csv",
             mime="text/csv",
@@ -938,7 +973,7 @@ with tab3:
 
     st.markdown(f"""
     <div class="custom-callout">
-        <div class="custom-callout-icon">📐</div>
+        <div class="custom-callout-icon" style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; font-weight: 700; color: #818CF8;">||Δ||</div>
         <div class="custom-callout-text">
             <b>Frobenius Norm of Correlation Drift:</b> <code style="color: #34D399; font-size: 0.95rem;">{frob_norm:.3f}</code> &nbsp;•&nbsp; 
             <i>Interpretation:</i> A Frobenius difference below 0.70 demonstrates superior joint dependency preservation without mode collapse or synthetic spurious correlations.
@@ -1033,7 +1068,7 @@ with tab4:
             <div class="glass-card">
                 <div class="metric-header">
                     <span class="metric-label">TSTR ROC-AUC</span>
-                    <div class="metric-icon-box" style="background: rgba(16, 185, 129, 0.15); color: #34D399;">🎯</div>
+                    <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.70rem; color: #34D399; background: rgba(16, 185, 129, 0.1); padding: 2px 6px; border-radius: 3px;">AUROC</span>
                 </div>
                 <div class="metric-value">{ml_results['TSTR_AUC']:.3f}</div>
                 <div class="metric-footer">
@@ -1045,7 +1080,7 @@ with tab4:
             <div class="glass-card">
                 <div class="metric-header">
                     <span class="metric-label">TSTR Accuracy</span>
-                    <div class="metric-icon-box" style="background: rgba(99, 102, 241, 0.15); color: #818CF8;">📊</div>
+                    <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.70rem; color: #818CF8; background: rgba(99, 102, 241, 0.1); padding: 2px 6px; border-radius: 3px;">ACC</span>
                 </div>
                 <div class="metric-value">{ml_results['TSTR_Accuracy']:.1%}</div>
                 <div class="metric-footer">
@@ -1057,7 +1092,7 @@ with tab4:
             <div class="glass-card">
                 <div class="metric-header">
                     <span class="metric-label">TSTR F1-Score</span>
-                    <div class="metric-icon-box" style="background: rgba(6, 182, 212, 0.15); color: #22D3EE;">⚖️</div>
+                    <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.70rem; color: #22D3EE; background: rgba(6, 182, 212, 0.1); padding: 2px 6px; border-radius: 3px;">F1</span>
                 </div>
                 <div class="metric-value">{ml_results['TSTR_F1']:.3f}</div>
                 <div class="metric-footer">
@@ -1068,13 +1103,13 @@ with tab4:
             
             <div class="glass-card">
                 <div class="metric-header">
-                    <span class="metric-label">Model Utility Index</span>
-                    <div class="metric-icon-box" style="background: rgba(139, 92, 246, 0.15); color: #C084FC;">🚀</div>
+                    <span class="metric-label">Utility Parity</span>
+                    <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.70rem; color: #C084FC; background: rgba(139, 92, 246, 0.1); padding: 2px 6px; border-radius: 3px;">INDEX</span>
                 </div>
                 <div class="metric-value">{(ml_results['TSTR_AUC'] / ml_results['TRTR_AUC']):.1%}</div>
                 <div class="metric-footer">
                     <span class="delta-badge delta-positive">High Parity</span>
-                    <span class="metric-subtext">Of Empirical Ceiling</span>
+                    <span class="metric-subtext">Empirical Ceiling</span>
                 </div>
             </div>
         </div>
@@ -1117,17 +1152,17 @@ with tab4:
 
         st.markdown("""
         <div class="custom-callout">
-            <div class="custom-callout-icon">🏆</div>
+            <div class="custom-callout-icon" style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; font-weight: 700; color: #10B981;">[OK]</div>
             <div class="custom-callout-text">
-                <b>Executive Finding:</b> Downstream churn classifiers trained exclusively on ChurnSynth diffusion samples reach <b>95%+ of the theoretical maximum ROC-AUC ceiling</b> while correctly ranking delivery delays, customer service escalations, and skipped subscription boxes as the primary drivers of customer attrition.
+                <b>Evaluation Summary:</b> Downstream churn classifiers trained exclusively on ChurnSynth diffusion samples reach <b>95%+ of the theoretical maximum ROC-AUC ceiling</b> while correctly ranking delivery delays, customer service escalations, and skipped subscription boxes as the primary drivers of customer attrition.
             </div>
         </div>
         """, unsafe_allow_html=True)
     else:
         st.markdown("""
         <div style="text-align: center; padding: 40px; background: rgba(15, 23, 42, 0.4); border-radius: 12px; border: 1px dashed rgba(255, 255, 255, 0.1);">
-            <div style="font-size: 2rem; margin-bottom: 8px;">⚡</div>
-            <div style="font-size: 1rem; color: #F8FAFC; font-weight: 600;">Benchmark Not Yet Executed</div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; color: #818CF8; margin-bottom: 6px;">[BENCHMARK STANDBY]</div>
+            <div style="font-size: 1rem; color: #F8FAFC; font-weight: 600;">Cross-Validation Pipeline Ready</div>
             <div style="font-size: 0.82rem; color: #64748B; margin-top: 4px;">Click the "Execute Real-Time TSTR Benchmark" button above to initiate training and cross-evaluation.</div>
         </div>
         """, unsafe_allow_html=True)
