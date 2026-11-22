@@ -68,17 +68,18 @@ header[data-testid="stHeader"] {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-bottom: 14px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    margin-bottom: 16px;
 }
 
 .nav-breadcrumbs {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 0.76rem;
+    font-size: 0.72rem;
+    letter-spacing: 0.02em;
 }
 
 .nav-org { color: #64748B; font-weight: 500; }
@@ -89,7 +90,7 @@ header[data-testid="stHeader"] {
 .nav-status-group {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
 }
 
 .status-pill {
@@ -97,49 +98,49 @@ header[data-testid="stHeader"] {
     align-items: center;
     gap: 6px;
     background: #0B0F17;
-    border: 1px solid #1E293B;
+    border: 1px solid rgba(255, 255, 255, 0.08);
     color: #94A3B8;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 0.72rem;
+    font-size: 0.70rem;
     font-weight: 500;
-    padding: 3px 9px;
+    padding: 2px 8px;
     border-radius: 4px;
 }
 
 .status-dot-solid {
-    width: 6px;
-    height: 6px;
+    width: 5px;
+    height: 5px;
     background-color: #10B981;
     border-radius: 50%;
 }
 
 .version-tag {
     background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.07);
     color: #64748B;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 0.70rem;
-    padding: 3px 8px;
+    font-size: 0.68rem;
+    padding: 2px 6px;
     border-radius: 4px;
 }
 
 /* Hero Title & Typography */
 .hero-title {
-    font-size: 2.15rem;
-    font-weight: 700;
-    letter-spacing: -0.025em;
-    line-height: 1.15;
+    font-size: 1.55rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
     color: #F8FAFC;
-    margin-top: 2px;
-    margin-bottom: 6px;
+    margin-top: 0px;
+    margin-bottom: 4px;
 }
 
 .hero-subtitle {
-    font-size: 0.92rem;
+    font-size: 0.84rem;
     color: #94A3B8;
-    line-height: 1.5;
-    max-width: 960px;
-    margin-bottom: 16px;
+    line-height: 1.4;
+    max-width: 860px;
+    margin-bottom: 12px;
     font-weight: 400;
 }
 
@@ -147,29 +148,30 @@ header[data-testid="stHeader"] {
 .enterprise-tag-list {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 24px;
+    gap: 6px;
+    margin-bottom: 18px;
 }
 
 .tag-item {
     display: inline-flex;
     align-items: center;
     background: #0B0F17;
-    border: 1px solid #1E293B;
-    color: #E2E8F0;
-    padding: 4px 10px;
-    border-radius: 5px;
-    font-size: 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    color: #CBD5E1;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.72rem;
+    letter-spacing: 0.01em;
 }
 
 .tag-label {
     color: #64748B;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 0.68rem;
+    font-size: 0.65rem;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-right: 6px;
+    letter-spacing: 0.06em;
+    margin-right: 5px;
 }
 
 /* Metadata Pill Badges */
@@ -215,12 +217,12 @@ header[data-testid="stHeader"] {
     color: #DDD6FE;
 }
 
-/* Glassmorphic Metric Cards */
+/* Enterprise Metric Cards */
 .metric-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
-    margin-bottom: 28px;
+    gap: 12px;
+    margin-bottom: 20px;
 }
 
 @media (max-width: 900px) {
@@ -230,108 +232,85 @@ header[data-testid="stHeader"] {
 }
 
 .glass-card {
-    background: rgba(15, 23, 42, 0.65);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    background: #0B0E17;
     border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 14px;
-    padding: 18px 20px;
-    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    border-radius: 8px;
+    padding: 12px 14px;
+    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05), 0 2px 6px rgba(0, 0, 0, 0.25);
+    transition: border-color 0.15s ease;
     position: relative;
-    overflow: hidden;
 }
 
 .glass-card:hover {
     border-color: rgba(255, 255, 255, 0.16);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.08);
-}
-
-.glass-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
 }
 
 .metric-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 10px;
+    margin-bottom: 6px;
 }
 
 .metric-label {
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.07em;
     text-transform: uppercase;
-    color: #94A3B8;
-}
-
-.metric-icon-box {
-    width: 28px;
-    height: 28px;
-    border-radius: 7px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.85rem;
+    color: #64748B;
+    font-family: 'JetBrains Mono', monospace;
 }
 
 .metric-value {
     font-family: 'JetBrains Mono', monospace !important;
-    font-size: 1.85rem;
-    font-weight: 700;
+    font-size: 1.55rem;
+    font-weight: 600;
     color: #F8FAFC;
-    letter-spacing: -0.03em;
+    letter-spacing: -0.02em;
     line-height: 1.1;
-    margin-bottom: 10px;
+    margin-bottom: 6px;
 }
 
 .metric-footer {
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-size: 0.78rem;
+    gap: 6px;
+    font-size: 0.72rem;
 }
 
 .delta-badge {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
-    padding: 2px 7px;
-    border-radius: 6px;
-    font-size: 0.72rem;
-    font-weight: 600;
+    gap: 3px;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 0.68rem;
+    font-weight: 500;
     font-family: 'JetBrains Mono', monospace;
 }
 
 .delta-neutral {
-    background: rgba(148, 163, 184, 0.12);
-    color: #CBD5E1;
-    border: 1px solid rgba(148, 163, 184, 0.2);
+    background: rgba(148, 163, 184, 0.08);
+    color: #94A3B8;
+    border: 1px solid rgba(148, 163, 184, 0.15);
 }
 
 .delta-positive {
-    background: rgba(16, 185, 129, 0.12);
+    background: rgba(16, 185, 129, 0.08);
     color: #34D399;
-    border: 1px solid rgba(16, 185, 129, 0.25);
+    border: 1px solid rgba(16, 185, 129, 0.2);
 }
 
 .delta-negative {
-    background: rgba(244, 63, 94, 0.12);
+    background: rgba(244, 63, 94, 0.08);
     color: #FB7185;
-    border: 1px solid rgba(244, 63, 94, 0.25);
+    border: 1px solid rgba(244, 63, 94, 0.2);
 }
 
 .metric-subtext {
     color: #64748B;
-    font-size: 0.75rem;
+    font-size: 0.70rem;
+    font-family: 'JetBrains Mono', monospace;
 }
 
 /* Tabs Styling - Linear Segmented Control */
@@ -763,22 +742,13 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 # Tab 1: Data Explorer & Export
 # ---------------------------------------------------------
 with tab1:
-    st.markdown("""
-    <div class="content-card">
-        <div class="card-title">Synthetic Cohort Inspector & Export Console</div>
-        <div class="card-desc">
-            Filter, inspect, and export continuous and discrete subscriber attributes generated via reverse Gaussian denoising.
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-    
     col_f1, col_f2 = st.columns(2)
     with col_f1:
         tier_opts = list(df_synth['subscription_tier'].unique())
-        selected_tier = st.multiselect("Filter by Subscription Tier", options=tier_opts, default=tier_opts)
+        selected_tier = st.multiselect("Subscription Tier", options=tier_opts, default=tier_opts)
     with col_f2:
-        selected_churn = st.multiselect("Filter by Churn Outcome", options=[0, 1], 
-                                        format_func=lambda x: "Active Subscriber (0)" if x == 0 else "Churned Subscriber (1)", 
+        selected_churn = st.multiselect("Churn Status", options=[0, 1], 
+                                        format_func=lambda x: "Active (0)" if x == 0 else "Churned (1)", 
                                         default=[0, 1])
 
     filtered_df = df_synth[
@@ -793,52 +763,34 @@ with tab1:
     filt_mrr = filtered_df['monthly_fee'].sum() if filt_count > 0 else 0
 
     st.markdown(f"""
-    <div style="display: flex; gap: 16px; margin-bottom: 12px; font-size: 0.82rem; color: #94A3B8;">
-        <span style="background: rgba(255, 255, 255, 0.04); padding: 5px 12px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.06);">
-            Filtered Records: <b style="color: #F8FAFC;">{filt_count:,}</b>
+    <div style="display: flex; gap: 8px; margin-bottom: 10px; font-size: 0.75rem; font-family: 'JetBrains Mono', monospace;">
+        <span style="background: #0B0E17; padding: 4px 10px; border-radius: 4px; border: 1px solid rgba(255, 255, 255, 0.08); color: #94A3B8;">
+            RECORDS: <b style="color: #F8FAFC;">{filt_count:,}</b>
         </span>
-        <span style="background: rgba(255, 255, 255, 0.04); padding: 5px 12px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.06);">
-            Churned Cohort: <b style="color: #F43F5E;">{filt_churn_cnt:,} ({filt_churn_rate:.1%})</b>
+        <span style="background: #0B0E17; padding: 4px 10px; border-radius: 4px; border: 1px solid rgba(255, 255, 255, 0.08); color: #94A3B8;">
+            CHURN: <b style="color: #FB7185;">{filt_churn_cnt:,} ({filt_churn_rate:.1%})</b>
         </span>
-        <span style="background: rgba(255, 255, 255, 0.04); padding: 5px 12px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.06);">
-            Synthesized Monthly Gross: <b style="color: #34D399;">${filt_mrr:,.2f}</b>
+        <span style="background: #0B0E17; padding: 4px 10px; border-radius: 4px; border: 1px solid rgba(255, 255, 255, 0.08); color: #94A3B8;">
+            PROJECTED MRR: <b style="color: #34D399;">${filt_mrr:,.2f}</b>
         </span>
     </div>
     """, unsafe_allow_html=True)
 
     st.dataframe(filtered_df, use_container_width=True, height=360)
 
-    col_btn, col_info = st.columns([1, 3])
-    with col_btn:
-        csv_data = filtered_df.to_csv(index=False).encode('utf-8')
-        st.download_button(
-            label="Export Synthetic Dataset (CSV)",
-            data=csv_data,
-            file_name="churnsynth_synthetic_subscription_data.csv",
-            mime="text/csv",
-            type="primary",
-            use_container_width=True
-        )
-    with col_info:
-        st.markdown("""
-        <div style="font-size: 0.8rem; color: #64748B; padding-top: 10px;">
-            ✓ Production-ready CSV artifact ready for ingestion into Snowflake, BigQuery, or Databricks feature stores.
-        </div>
-        """, unsafe_allow_html=True)
+    csv_data = filtered_df.to_csv(index=False).encode('utf-8')
+    st.download_button(
+        label="Export Synthetic Dataset (CSV)",
+        data=csv_data,
+        file_name="churnsynth_synthetic_subscription_data.csv",
+        mime="text/csv",
+        type="primary"
+    )
 
 # ---------------------------------------------------------
 # Tab 2: Statistical Distribution Fidelity
 # ---------------------------------------------------------
 with tab2:
-    st.markdown("""
-    <div class="content-card">
-        <div class="card-title">Marginal Distribution Alignment & Kolmogorov-Smirnov Tests</div>
-        <div class="card-desc">
-            Verify how accurately the continuous and categorical variables match the true ground truth distributions of subscription lifecycles.
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
     continuous_features = [
         'tenure_months', 'monthly_fee', 'app_logins_per_month', 
         'skipped_boxes_ratio', 'cs_tickets_raised', 'delivery_delays_count', 
@@ -959,24 +911,15 @@ with tab2:
 # Tab 3: Correlation & Covariance Preservation
 # ---------------------------------------------------------
 with tab3:
-    st.markdown("""
-    <div class="content-card">
-        <div class="card-title">Inter-Feature Covariance & Non-Linear Dependencies</div>
-        <div class="card-desc">
-            Evaluating multivariate correlation preservation. A high-fidelity generative model must replicate realistic behavioral interactions (e.g. how customer complaints and delivery delays trigger churn).
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
     num_cols = continuous_features + ['churned']
     corr_real, corr_synth, diff_corr, frob_norm = compute_correlation_difference(df_real, df_synth, num_cols)
 
     st.markdown(f"""
-    <div class="custom-callout">
+    <div class="custom-callout" style="margin-bottom: 14px;">
         <div class="custom-callout-icon" style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; font-weight: 700; color: #818CF8;">||Δ||</div>
         <div class="custom-callout-text">
-            <b>Frobenius Norm of Correlation Drift:</b> <code style="color: #34D399; font-size: 0.95rem;">{frob_norm:.3f}</code> &nbsp;•&nbsp; 
-            <i>Interpretation:</i> A Frobenius difference below 0.70 demonstrates superior joint dependency preservation without mode collapse or synthetic spurious correlations.
+            <b>Frobenius Correlation Drift:</b> <code style="color: #34D399; font-size: 0.90rem;">{frob_norm:.3f}</code> &nbsp;•&nbsp; 
+            <i>Benchmark:</i> Values < 0.70 demonstrate rigorous joint dependency preservation without mode collapse.
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -1032,22 +975,13 @@ with tab3:
 # Tab 4: ML Utility Benchmark (TSTR)
 # ---------------------------------------------------------
 with tab4:
-    st.markdown("""
-    <div class="content-card">
-        <div class="card-title">TSTR (Train on Synthetic, Test on Real) Benchmark</div>
-        <div class="card-desc">
-            The decisive acid test: Train a downstream Random Forest classifier <b>strictly on synthetic data</b> and evaluate its generalization performance on <b>unseen real holdout customers</b>.
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-    col_act, col_desc = st.columns([1, 2])
+    col_act, col_desc = st.columns([1, 3])
     with col_act:
-        run_bench = st.button("⚡ Execute Real-Time TSTR Benchmark", type="primary", use_container_width=True)
+        run_bench = st.button("Run TSTR Validation", type="primary", use_container_width=True)
     with col_desc:
         st.markdown("""
-        <div style="font-size: 0.8rem; color: #94A3B8; padding-top: 8px;">
-            Trains two isolated Random Forest ensembles: <b>TRTR</b> (Real Baseline) vs <b>TSTR</b> (Synthetic Diffusion) and compares holdout metrics.
+        <div style="font-size: 0.74rem; color: #94A3B8; font-family: 'JetBrains Mono', monospace; padding-top: 6px;">
+            PROTOCOL: Train Random Forest exclusively on synthetic data & score against unseen real holdout set.
         </div>
         """, unsafe_allow_html=True)
 
@@ -1171,56 +1105,47 @@ with tab4:
 # Tab 5: Architecture & Presentation Guide
 # ---------------------------------------------------------
 with tab5:
-    st.markdown("""
-    <div class="content-card">
-        <div class="card-title">Enterprise Architecture & Mathematical Methodology</div>
-        <div class="card-desc">
-            Complete technical breakdown of the Tabular DDPM framework, privacy guarantees, and competitive advantage over Tabular GANs.
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
     col_a1, col_a2 = st.columns(2)
     with col_a1:
         st.markdown("""
-        <div class="glass-card" style="margin-bottom: 16px;">
-            <div style="font-size: 0.95rem; font-weight: 700; color: #818CF8; margin-bottom: 8px;">1. Business Problem & Motivation</div>
-            <div style="font-size: 0.83rem; color: #CBD5E1; line-height: 1.6;">
-                • <b>Cold-Start Challenge:</b> Direct-to-Consumer (DTC) subscription businesses face 25–40% annualized customer churn, but nascent product lines lack the historical volume necessary for deep learning models.<br>
-                • <b>Regulatory Privacy Barriers:</b> GDPR, CCPA, and CPRA strictly limit the sharing and secondary usage of customer behavioral logs between analytics teams, third-party contractors, and LLM fine-tuning pipelines.
+        <div class="glass-card" style="margin-bottom: 12px;">
+            <div style="font-size: 0.82rem; font-weight: 600; color: #818CF8; margin-bottom: 6px; font-family: 'JetBrains Mono', monospace; text-transform: uppercase;">1. Problem Formulation</div>
+            <div style="font-size: 0.78rem; color: #CBD5E1; line-height: 1.5;">
+                • <b>Cold-Start:</b> New subscription tiers lack the historical churn volume required for training prediction models.<br>
+                • <b>Compliance:</b> Privacy laws (GDPR/CCPA) prohibit sharing subscriber logs across internal or third-party teams.
             </div>
         </div>
         
         <div class="glass-card">
-            <div style="font-size: 0.95rem; font-weight: 700; color: #34D399; margin-bottom: 8px;">2. Tabular DDPM vs Tabular GANs (CTGAN)</div>
-            <div style="font-size: 0.83rem; color: #CBD5E1; line-height: 1.6;">
-                • <b>Elimination of Mode Collapse:</b> GAN discriminators notoriously oscillate and drop minority failure modes (e.g., sudden churn among VIP subscribers). Diffusion models stably optimize a mean-squared error lower bound.<br>
-                • <b>Coverage of Complex Manifolds:</b> The 100-step reverse stochastic denoising trajectory prevents hyper-compression, maintaining heavy-tailed distributions in customer tenure and complaint counts.
+            <div style="font-size: 0.82rem; font-weight: 600; color: #34D399; margin-bottom: 6px; font-family: 'JetBrains Mono', monospace; text-transform: uppercase;">2. DDPM vs CTGAN</div>
+            <div style="font-size: 0.78rem; color: #CBD5E1; line-height: 1.5;">
+                • <b>No Mode Collapse:</b> Diffusion optimizes an exact MSE lower bound, eliminating GAN minimax oscillation.<br>
+                • <b>Fidelity:</b> 100-step reverse SDE preserves heavy tails in tenure, complaints, and delivery delay distributions.
             </div>
         </div>
         """, unsafe_allow_html=True)
 
     with col_a2:
         st.markdown("""
-        <div class="glass-card" style="margin-bottom: 16px;">
-            <div style="font-size: 0.95rem; font-weight: 700; color: #22D3EE; margin-bottom: 8px;">3. Mathematical Formulation</div>
-            <div style="font-size: 0.83rem; color: #CBD5E1; line-height: 1.6;">
-                • <b>Forward Diffusion Process:</b> Gradually injects Gaussian noise into continuous feature vector $x_0$:
-                <div style="background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px; margin: 6px 0; font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: #38BDF8;">
-                    q(x_t | x_{t-1}) = N(x_t; sqrt(1 - beta_t) * x_{t-1}, beta_t * I)
+        <div class="glass-card" style="margin-bottom: 12px;">
+            <div style="font-size: 0.82rem; font-weight: 600; color: #22D3EE; margin-bottom: 6px; font-family: 'JetBrains Mono', monospace; text-transform: uppercase;">3. Mathematical Formulation</div>
+            <div style="font-size: 0.78rem; color: #CBD5E1; line-height: 1.5;">
+                • <b>Forward Diffusion:</b> Adds Gaussian noise to continuous feature vector $x_0$:
+                <div style="background: rgba(0,0,0,0.3); padding: 5px 8px; border-radius: 4px; margin: 4px 0; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #38BDF8;">
+                    q(x_t | x_0) = N(x_t; sqrt(alpha_bar_t) * x_0, (1 - alpha_bar_t) * I)
                 </div>
-                • <b>Reverse Denoising Objective:</b> Neural network parameterized by theta estimates injected noise epsilon:
-                <div style="background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px; margin: 6px 0; font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: #34D399;">
-                    L = E_{t, x_0, epsilon} [ || epsilon - epsilon_theta(x_t, t) ||^2 ]
+                • <b>Denoising Loss:</b> Minimizes MSE on predicted noise:
+                <div style="background: rgba(0,0,0,0.3); padding: 5px 8px; border-radius: 4px; margin: 4px 0; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #34D399;">
+                    L = E_{t, x_0, eps} [ || eps - eps_theta(x_t, t) ||^2 ]
                 </div>
             </div>
         </div>
 
         <div class="glass-card">
-            <div style="font-size: 0.95rem; font-weight: 700; color: #FBBF24; margin-bottom: 8px;">4. Privacy & Governance Guarantees</div>
-            <div style="font-size: 0.83rem; color: #CBD5E1; line-height: 1.6;">
-                • <b>Zero 1-to-1 Memorization:</b> Continuous latent space sampling ensures no direct copy-paste of real customer identities or payment amounts.<br>
-                • <b>Audit-Ready Compliance:</b> Generates synthetic cohorts that pass rigorous Kolmogorov-Smirnov and correlation tests while completely neutralizing re-identification risk.
+            <div style="font-size: 0.82rem; font-weight: 600; color: #FBBF24; margin-bottom: 6px; font-family: 'JetBrains Mono', monospace; text-transform: uppercase;">4. Governance & Privacy</div>
+            <div style="font-size: 0.78rem; color: #CBD5E1; line-height: 1.5;">
+                • <b>Zero 1-to-1 Memorization:</b> Trajectories sampled from latent Gaussian manifold, preventing identity copying.<br>
+                • <b>Audit Parity:</b> Passes rigorous two-sample Kolmogorov-Smirnov and multivariate covariance checks.
             </div>
         </div>
         """, unsafe_allow_html=True)
