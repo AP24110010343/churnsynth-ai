@@ -13,12 +13,22 @@ from evaluate import compute_distribution_metrics, compute_correlation_differenc
 # -----------------------------------------------------------------------------
 # 1. Page Configuration
 # -----------------------------------------------------------------------------
+# 1. Page Configuration & HTML Utility
+# -----------------------------------------------------------------------------
 st.set_page_config(
     page_title="ChurnSynth Platform | Tabular Diffusion Engine",
     page_icon="◈",
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
+def render_html(html_str: str):
+    """
+    Renders HTML safely in Streamlit without triggering CommonMark's
+    indented code block parser (which occurs when lines have 4+ spaces of indentation).
+    """
+    clean = "\n".join(line.strip() for line in html_str.splitlines() if line.strip())
+    st.markdown(clean, unsafe_allow_html=True)
 
 # -----------------------------------------------------------------------------
 # 2. Complete CSS Design Token Matrix (Linear x Vercel x Bloomberg)
@@ -594,7 +604,7 @@ def get_executive_layout(title: str = "", subtitle: str = "", height: int = 360,
 # -----------------------------------------------------------------------------
 # 5. Top Navigation & Header
 # -----------------------------------------------------------------------------
-st.markdown("""
+render_html("""
 <div class="top-nav-bar">
     <div class="nav-breadcrumbs">
         <span class="nav-brand">◈ CHURNSYNTH</span>
@@ -611,10 +621,10 @@ st.markdown("""
         <span class="version-tag">v2.4-PRO</span>
     </div>
 </div>
-""", unsafe_allow_html=True)
+""")
 
-st.markdown('<div class="hero-title">Subscription Churn Simulation & Synthesis</div>', unsafe_allow_html=True)
-st.markdown("""
+render_html('<div class="hero-title">Subscription Churn Simulation & Synthesis</div>')
+render_html("""
 <div class="hero-subtitle">
 High-fidelity customer lifecycle and churn simulation powered by continuous Gaussian reverse diffusion.
 Designed to validate downstream predictive ML pipelines without customer data exposure.
@@ -626,16 +636,16 @@ Designed to validate downstream predictive ML pipelines without customer data ex
     <span class="tag-item"><span class="tag-label">Sampling</span>Reverse Gaussian SDE (T=100)</span>
     <span class="tag-item"><span class="tag-label">Protocol</span>TSTR Holdout Benchmark</span>
 </div>
-""", unsafe_allow_html=True)
+""")
 
 # -----------------------------------------------------------------------------
 # 6. Sidebar Generator Controls
 # -----------------------------------------------------------------------------
 with st.sidebar:
-    st.markdown("""
+    render_html("""
     <div class="sidebar-title">GENERATOR PARAMETERS</div>
     <div class="sidebar-subtitle">Configure reverse diffusion sampling engine:</div>
-    """, unsafe_allow_html=True)
+    """)
     
     n_samples = st.slider(
         "Synthetic Cohort Size (N)",
@@ -653,8 +663,8 @@ with st.sidebar:
         help="Entropy scaling during reverse steps. 0.95 is calibrated for optimal balance between mode fidelity and edge diversity."
     )
     
-    st.markdown('<div class="sidebar-section-title">Architecture Specifications</div>', unsafe_allow_html=True)
-    st.markdown(f"""
+    render_html('<div class="sidebar-section-title">Architecture Specifications</div>')
+    render_html(f"""
     <div class="sidebar-spec-box">
         <div class="sidebar-spec-row">
             <span class="spec-key">Model Family</span>
@@ -673,17 +683,17 @@ with st.sidebar:
             <span class="spec-val">{ddpm.device.upper()}</span>
         </div>
     </div>
-    """, unsafe_allow_html=True)
+    """)
     
-    st.markdown('<div class="sidebar-section-title">Differential Privacy & Governance</div>', unsafe_allow_html=True)
-    st.markdown("""
+    render_html('<div class="sidebar-section-title">Differential Privacy & Governance</div>')
+    render_html("""
     <div class="callout-box" style="margin-bottom: 14px;">
         <div class="callout-icon">ℹ</div>
         <div class="callout-text">
             <b>Privacy Guarantee:</b> Synthetic rows represent probabilistic trajectories rather than 1:1 records of real subscribers (Membership Inference Protection).
         </div>
     </div>
-    """, unsafe_allow_html=True)
+    """)
     
     if st.button("Sample Synthetic Cohort (Reverse SDE)", width="stretch", type="primary"):
         with st.spinner(f"Executing reverse diffusion across 100 timesteps for {n_samples:,} records..."):
@@ -713,7 +723,7 @@ churn_badge_class = "delta-pos" if abs(churn_diff) <= 0.02 else ("delta-neutral"
 fee_badge_class = "delta-pos" if abs(fee_diff) <= 1.5 else "delta-neutral"
 tenure_badge_class = "delta-pos" if abs(tenure_diff) <= 1.0 else "delta-neutral"
 
-st.markdown(f"""
+render_html(f"""
 <div class="kpi-grid">
     <div class="kpi-card">
         <div class="kpi-header">
@@ -726,7 +736,6 @@ st.markdown(f"""
             <span class="baseline-text">Reverse SDE (100)</span>
         </div>
     </div>
-    
     <div class="kpi-card">
         <div class="kpi-header">
             <span class="kpi-label">SIMULATED CHURN</span>
@@ -738,7 +747,6 @@ st.markdown(f"""
             <span class="baseline-text">Real: {real_churn:.1%}</span>
         </div>
     </div>
-    
     <div class="kpi-card">
         <div class="kpi-header">
             <span class="kpi-label">PROJECTED ARPU</span>
@@ -750,7 +758,6 @@ st.markdown(f"""
             <span class="baseline-text">Real: ${real_fee:.2f}</span>
         </div>
     </div>
-    
     <div class="kpi-card">
         <div class="kpi-header">
             <span class="kpi-label">AVERAGE TENURE</span>
@@ -763,7 +770,7 @@ st.markdown(f"""
         </div>
     </div>
 </div>
-""", unsafe_allow_html=True)
+""")
 
 # -----------------------------------------------------------------------------
 # 8. Segmented Tab Navigation
@@ -802,7 +809,7 @@ with tab1:
     filt_churn_rate = filt_churn_cnt / filt_count if filt_count > 0 else 0
     filt_mrr = filtered_df['monthly_fee'].sum() if filt_count > 0 else 0
 
-    st.markdown(f"""
+    render_html(f"""
     <div style="display: flex; gap: 8px; margin-bottom: 12px; font-size: 0.72rem; font-family: 'JetBrains Mono', monospace;">
         <span style="background: #0B0E17; padding: 4px 10px; border-radius: 4px; border: 1px solid var(--cs-border-default); color: var(--cs-text-secondary);">
             RECORDS: <b style="color: var(--cs-text-primary);">{filt_count:,}</b>
@@ -814,7 +821,7 @@ with tab1:
             PROJECTED MRR: <b style="color: var(--cs-emerald);">${filt_mrr:,.2f}</b>
         </span>
     </div>
-    """, unsafe_allow_html=True)
+    """)
 
     table_column_config = {
         "customer_id": st.column_config.TextColumn("Customer ID"),
@@ -870,7 +877,7 @@ with tab2:
     synth_feat_std = df_synth[selected_feat].std()
     
     with col_stat:
-        st.markdown(f"""
+        render_html(f"""
         <div style="display: flex; gap: 10px; padding-top: 18px; font-size: 0.78rem; font-family: 'JetBrains Mono', monospace;">
             <div style="background: var(--cs-surface-l1); border: 1px solid var(--cs-border-default); padding: 7px 12px; border-radius: 4px;">
                 <span style="color: var(--cs-text-secondary);">Real Mean ± Std:</span> <b style="color: #818CF8;">{real_feat_mean:.2f} ± {real_feat_std:.2f}</b>
@@ -879,7 +886,7 @@ with tab2:
                 <span style="color: var(--cs-text-secondary);">Synthetic Mean ± Std:</span> <b style="color: var(--cs-emerald);">{synth_feat_mean:.2f} ± {synth_feat_std:.2f}</b>
             </div>
         </div>
-        """, unsafe_allow_html=True)
+        """)
 
     # Double Overlaid Histogram
     fig_dist = go.Figure()
@@ -944,7 +951,7 @@ with tab2:
         )
         st.plotly_chart(fig_box, width="stretch")
 
-    st.markdown('<div class="sidebar-section-title">Quantitative Statistical Fidelity Scorecard</div>', unsafe_allow_html=True)
+    render_html('<div class="sidebar-section-title">Quantitative Statistical Fidelity Scorecard</div>')
     dist_metrics_df = compute_distribution_metrics(df_real, df_synth, continuous_features)
     
     # Executive rating column
@@ -980,7 +987,7 @@ with tab3:
     num_cols = continuous_features + ['churned']
     corr_real, corr_synth, diff_corr, frob_norm = compute_correlation_difference(df_real, df_synth, num_cols)
 
-    st.markdown(f"""
+    render_html(f"""
     <div class="callout-box" style="margin-bottom: 14px;">
         <div class="callout-icon">||Δ||</div>
         <div class="callout-text">
@@ -988,7 +995,7 @@ with tab3:
             <span>Benchmark: Values &lt; 0.70 demonstrate rigorous joint dependency preservation without mode collapse.</span>
         </div>
     </div>
-    """, unsafe_allow_html=True)
+    """)
 
     col_h1, col_h2 = st.columns(2)
     colorscale_custom = [
@@ -1023,7 +1030,7 @@ with tab3:
         )
         st.plotly_chart(fig_s, width="stretch")
 
-    st.markdown('<div class="sidebar-section-title">Residual Drift Matrix (|Synthetic - Real|)</div>', unsafe_allow_html=True)
+    render_html('<div class="sidebar-section-title">Residual Drift Matrix (|Synthetic - Real|)</div>')
     abs_diff = np.abs(diff_corr)
     fig_diff = px.imshow(
         abs_diff,
@@ -1045,11 +1052,11 @@ with tab4:
     with col_act:
         run_bench = st.button("Run TSTR Validation", type="primary", width="stretch")
     with col_desc:
-        st.markdown("""
+        render_html("""
         <div style="font-size: 0.74rem; color: var(--cs-text-secondary); font-family: 'JetBrains Mono', monospace; padding-top: 6px;">
             PROTOCOL: Train Random Forest exclusively on synthetic data & score against unseen real holdout set.
         </div>
-        """, unsafe_allow_html=True)
+        """)
 
     if run_bench or 'ml_results' in st.session_state:
         if run_bench:
@@ -1062,7 +1069,7 @@ with tab4:
         acc_delta = ml_results['TSTR_Accuracy'] - ml_results['TRTR_Accuracy']
         f1_delta = ml_results['TSTR_F1'] - ml_results['TRTR_F1']
 
-        st.markdown(f"""
+        render_html(f"""
         <div class="kpi-grid" style="margin-top: 16px;">
             <div class="kpi-card">
                 <div class="kpi-header">
@@ -1075,7 +1082,6 @@ with tab4:
                     <span class="baseline-text">Real: {ml_results['TRTR_AUC']:.3f}</span>
                 </div>
             </div>
-            
             <div class="kpi-card">
                 <div class="kpi-header">
                     <span class="kpi-label">TSTR ACCURACY</span>
@@ -1087,7 +1093,6 @@ with tab4:
                     <span class="baseline-text">Real: {ml_results['TRTR_Accuracy']:.1%}</span>
                 </div>
             </div>
-            
             <div class="kpi-card">
                 <div class="kpi-header">
                     <span class="kpi-label">TSTR F1-SCORE</span>
@@ -1099,7 +1104,6 @@ with tab4:
                     <span class="baseline-text">Real: {ml_results['TRTR_F1']:.3f}</span>
                 </div>
             </div>
-            
             <div class="kpi-card">
                 <div class="kpi-header">
                     <span class="kpi-label">UTILITY PARITY</span>
@@ -1112,7 +1116,7 @@ with tab4:
                 </div>
             </div>
         </div>
-        """, unsafe_allow_html=True)
+        """)
 
         col_imp, col_cm = st.columns([3, 2])
         with col_imp:
@@ -1149,22 +1153,22 @@ with tab4:
             )
             st.plotly_chart(fig_cm, width="stretch")
 
-        st.markdown("""
+        render_html("""
         <div class="callout-box">
             <div class="callout-icon" style="color: var(--cs-emerald);">[OK]</div>
             <div class="callout-text">
                 <b>Evaluation Summary:</b> Downstream churn classifiers trained exclusively on ChurnSynth diffusion samples reach <b>95%+ of the theoretical maximum ROC-AUC ceiling</b> while correctly ranking delivery delays, customer service escalations, and skipped subscription boxes as the primary drivers of customer attrition.
             </div>
         </div>
-        """, unsafe_allow_html=True)
+        """)
     else:
-        st.markdown("""
+        render_html("""
         <div style="text-align: center; padding: 36px 20px; background: var(--cs-surface-l1); border-radius: 6px; border: 1px dashed var(--cs-border-default);">
             <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; color: #818CF8; margin-bottom: 6px;">[BENCHMARK STANDBY]</div>
             <div style="font-size: 0.95rem; color: var(--cs-text-primary); font-weight: 600;">Cross-Validation Pipeline Ready</div>
             <div style="font-size: 0.78rem; color: var(--cs-text-tertiary); margin-top: 4px;">Click the "Run TSTR Validation" button above to initiate training and cross-evaluation against unseen real customers.</div>
         </div>
-        """, unsafe_allow_html=True)
+        """)
 
 # -----------------------------------------------------------------------------
 # Tab 5: Architecture & Methodology
@@ -1172,7 +1176,7 @@ with tab4:
 with tab5:
     col_a1, col_a2 = st.columns(2)
     with col_a1:
-        st.markdown("""
+        render_html("""
         <div class="kpi-card" style="margin-bottom: 12px;">
             <div class="kpi-label" style="color: #818CF8; margin-bottom: 6px;">1. PROBLEM FORMULATION</div>
             <div style="font-size: 0.78rem; color: #CBD5E1; line-height: 1.55;">
@@ -1180,7 +1184,6 @@ with tab5:
                 • <b>Compliance & Privacy:</b> Regulations (GDPR/CCPA) strictly restrict cross-departmental sharing of raw subscriber transaction records.
             </div>
         </div>
-        
         <div class="kpi-card">
             <div class="kpi-label" style="color: #34D399; margin-bottom: 6px;">2. DDPM VS CTGAN BENCHMARK</div>
             <div style="font-size: 0.78rem; color: #CBD5E1; line-height: 1.55;">
@@ -1188,10 +1191,10 @@ with tab5:
                 • <b>Tail Distribution Fidelity:</b> 100-step reverse SDE retains extreme percentiles in customer service tickets and delivery delays.
             </div>
         </div>
-        """, unsafe_allow_html=True)
+        """)
 
     with col_a2:
-        st.markdown(r"""
+        render_html(r"""
         <div class="kpi-card" style="margin-bottom: 12px;">
             <div class="kpi-label" style="color: #22D3EE; margin-bottom: 6px;">3. MATHEMATICAL FORMULATION</div>
             <div style="font-size: 0.78rem; color: #CBD5E1; line-height: 1.55;">
@@ -1205,7 +1208,6 @@ with tab5:
                 </div>
             </div>
         </div>
-
         <div class="kpi-card">
             <div class="kpi-label" style="color: #FBBF24; margin-bottom: 6px;">4. GOVERNANCE & PRIVACY GUARANTEE</div>
             <div style="font-size: 0.78rem; color: #CBD5E1; line-height: 1.55;">
@@ -1213,4 +1215,4 @@ with tab5:
                 • <b>Audit Parity:</b> Statistically validated through two-sample Kolmogorov-Smirnov tests and multivariate covariance distance checks.
             </div>
         </div>
-        """, unsafe_allow_html=True)
+        """)
